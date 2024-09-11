@@ -4,14 +4,14 @@ import PVideoListToolbar from '@/components/containment/toolbars/PVideoListToolb
 import PLoader from '@/components/containment/loaders/PLoader.vue'
 import { useVideosQuery } from '@/composables/useVideosQuery'
 
-const videoQuery = useVideosQuery()
+const videosQuery = useVideosQuery()
 </script>
 
 <template>
-  <PLoader :use-query="videoQuery">
-    <template #default="{ data }">
+  <PLoader :query="videosQuery">
+    <template #default="{ data: videos }">
       <PVideoListToolbar class="sticky-top bg-transparent" />
-      <PVideoList :videos="data" />
+      <PVideoList :videos="videos" />
     </template>
   </PLoader>
 </template>

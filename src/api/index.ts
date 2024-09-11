@@ -6,16 +6,15 @@ const pause = async () => new Promise((resolve) => window.setTimeout(resolve, 10
 const api: API = {
   getVideo: async (id: string): Promise<Video> => {
     await pause()
-    return new Promise((resolve, reject) => {
-      const foundVideo = videos.find((video) => video.id === id)
-      foundVideo ? resolve(foundVideo) : reject()
-    })
+    const foundVideo = videos.find((video) => video.id === id)
+    if (!foundVideo) {
+      throw new Error(`Video ${id} not found`)
+    }
+    return foundVideo
   },
   getVideos: async (): Promise<Video[]> => {
     await pause()
-    return new Promise((resolve) => {
-      resolve(videos)
-    })
+    return videos
   }
 }
 

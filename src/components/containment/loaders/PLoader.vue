@@ -1,13 +1,19 @@
-<script setup lang="ts">
-import type { UseVideosQueryReturnType } from '@/types'
+<script setup lang="ts" generic="T extends UseQueryReturnType<unknown, unknown>">
+import type { UseQueryReturnType } from '@tanstack/vue-query'
+import { type UnwrapRef } from 'vue'
 
-export type PLoaderProps = {
-  useQuery: UseVideosQueryReturnType
-}
+type Data = NonNullable<UnwrapRef<T['data']>>
 
-const props = defineProps<PLoaderProps>()
+const props = defineProps<{
+  query: T
+}>()
 
-const { data, isPending } = props.useQuery
+defineSlots<{
+  pending(): void
+  default(props: { data: Data }): void
+}>()
+
+const { data, isPending } = props.query
 </script>
 
 <template>
@@ -18,5 +24,5 @@ const { data, isPending } = props.useQuery
       </div>
     </slot>
   </template>
-  <slot v-else-if="data" :data="data" />
+  <slot v-else-if="data" :data="data as Data" />
 </template>
