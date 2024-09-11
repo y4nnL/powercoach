@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { type Video } from '@/types'
 import PIcon from '@/components/icons/PIcon.vue'
 import PTagIcon from '@/components/icons/PTagIcon.vue'
@@ -14,9 +13,9 @@ export type PVideoListItemProps = {
 
 const props = defineProps<PVideoListItemProps>()
 
-const router = useRouter()
-
-const navigateToVideo = () => router.push(`/videos/${props.video.id}`)
+const emit = defineEmits<{
+  click: [Video]
+}>()
 
 const { data, isError, refetch } = useImageDataURLQuery(props.video.thumbnail)
 
@@ -33,7 +32,7 @@ watch<boolean>(
         v-if="props.visible && data"
         class="card ratio ratio-1x1 border border-0 rounded-0"
         key="thumbnail"
-        @click="navigateToVideo"
+        @click="emit('click', props.video)"
       >
         <img :src="data" />
         <div class="card-img-overlay d-flex align-items-end m-0 p-0">

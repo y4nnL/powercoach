@@ -35,6 +35,10 @@ const variants: Exercise[] = [
     lift: Lift.Squat
   },
   {
+    title: 'Pause squat',
+    lift: Lift.Squat
+  },
+  {
     title: 'Bench press 3CT',
     lift: Lift.BenchPress
   },

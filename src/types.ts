@@ -29,4 +29,13 @@ export type Video = {
   thumbnail: string
 }
 
+export enum Scale {
+  All = 'all',
+  Block = 'block',
+  Week = 'week',
+  Workout = 'workout',
+  Exercise = 'exercise',
+  Set = 'set'
+}
+
 export type VideoTag = 'comment' | 'fail' | 'great' | 'pass' | 'pb' | 'review'
