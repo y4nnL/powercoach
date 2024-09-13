@@ -3,15 +3,15 @@ import { ExerciseType, Lift, type Exercise } from '@/types'
 
 const lifts: Exercise[] = [
   {
-    title: 'Squat',
+    title: 'Competition squat',
     lift: Lift.Squat
   },
   {
-    title: 'Bench press',
+    title: 'Competition bench press',
     lift: Lift.BenchPress
   },
   {
-    title: 'Deadlift',
+    title: 'Competition deadlift',
     lift: Lift.Deadlift
   }
 ].map(({ title, lift }) => ({

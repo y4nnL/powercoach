@@ -18,7 +18,7 @@ const scale = ref<Scale>(Scale.All)
   <PLoader :query="videosQuery">
     <template #default="{ data: videos }">
       <PVideoListToolbar class="sticky-top bg-transparent" />
-      <PVideoList :videos="videos" />
+      <PVideoList v-model:scale="scale" :videos="videos" />
       <Teleport to="#fixed-bottom">
         <PScaleButtonGroup
           class="position-relative start-50 translate-middle-x mb-2"

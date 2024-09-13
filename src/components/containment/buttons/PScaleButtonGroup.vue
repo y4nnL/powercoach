@@ -28,8 +28,8 @@ const scaleModel = defineModel<Scale>('scale', { required: true })
       class="btn"
       :key="scale"
       :class="{
-        'rounded-start-5': !index,
-        'rounded-end-5': index === props.scales.length - 1,
+        'rounded-start-pill': !index,
+        'rounded-end-pill': index === props.scales.length - 1,
         'btn-primary': scaleModel === scale,
         'btn-secondary': scaleModel !== scale
       }"

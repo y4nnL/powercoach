@@ -5,5 +5,6 @@
   "common_exercise": "Exercise",
   "common_set": "Série",
   "common_week": "Semaine",
-  "common_workout": "Séance"
+  "common_workout": "Séance",
+  "common_fromTo": "Du {from} au {to}"
 }

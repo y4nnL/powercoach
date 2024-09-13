@@ -23,10 +23,14 @@ export enum Lift {
 }
 
 export type Video = {
+  blockId: string
+  date: string
   id: string
   exercise: Exercise
   tags: VideoTag[]
   thumbnail: string
+  weekId: string
+  workoutId: string
 }
 
 export enum Scale {

@@ -1,7 +1,7 @@
 import type { Directive, DirectiveBinding } from 'vue'
 
-const VISIBLE_DELAY_THRESHOLD = 200
-const VISIBLE_DELAY = 500
+const IMMEDIATELY_VISIBLE_TIME = 200
+const TIME_IN_VIEWPORT = 500
 
 const timeouts: Record<string, number> = {}
 const observers: Record<string, IntersectionObserver> = {}
@@ -18,9 +18,9 @@ function mounted(element: HTMLElement, binding: DirectiveBinding<() => any>) {
         unmounted(element)
       }
       if (isIntersecting) {
-        Date.now() - mountedAt < VISIBLE_DELAY_THRESHOLD
+        Date.now() - mountedAt < IMMEDIATELY_VISIBLE_TIME
           ? trigger()
-          : (timeouts[element.dataset.pIntersect!] = window.setTimeout(trigger, VISIBLE_DELAY))
+          : (timeouts[element.dataset.pIntersect!] = window.setTimeout(trigger, TIME_IN_VIEWPORT))
       } else {
         window.clearTimeout(timeouts[element.dataset.pIntersect!])
         delete timeouts[element.dataset.pIntersect!]
