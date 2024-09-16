@@ -3,6 +3,12 @@ export type API = {
   getVideos: () => Promise<Video[]>
 }
 
+export type Block = {
+  id: string
+  index: number
+  name?: string
+}
+
 export type Exercise = {
   id: string
   lift: Lift | null
@@ -23,14 +29,15 @@ export enum Lift {
 }
 
 export type Video = {
-  blockId: string
+  block: Block
   date: string
   id: string
   exercise: Exercise
+  set: Set
   tags: VideoTag[]
   thumbnail: string
-  weekId: string
-  workoutId: string
+  week: Week
+  workout: Workout
 }
 
 export enum Scale {
@@ -40,6 +47,24 @@ export enum Scale {
   Workout = 'workout',
   Exercise = 'exercise',
   Set = 'set'
+}
+
+export type Set = {
+  id: string
+  index: number
+  name?: string
+}
+
+export type Week = {
+  id: string
+  index: number
+  name?: string
+}
+
+export type Workout = {
+  id: string
+  index: number
+  name?: string
 }
 
 export type VideoTag = 'comment' | 'fail' | 'great' | 'pass' | 'pb' | 'review'

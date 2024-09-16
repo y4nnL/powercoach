@@ -20,7 +20,10 @@ const more = computed<number>(() => props.videos.length - props.preview)
 </script>
 
 <template>
-  <div class="card shadow text-bg-dark border-0 rounded-4 overflow-hidden">
+  <div
+    class="card shadow text-bg-dark border-0 rounded-4 overflow-hidden"
+    style="--bs-box-shadow: 0 0.7rem 1.2rem rgba(0, 0, 0, 0.25)"
+  >
     <div class="container-fluid card-img">
       <div class="row gy-0">
         <PVideoListItem
@@ -51,8 +54,8 @@ const more = computed<number>(() => props.videos.length - props.preview)
         --bs-bg-opacity: 0;
       "
     >
-      <h6 class="card-subtitle mb-2 small opacity-75">{{ props.title }}</h6>
-      <h5 class="card-title">{{ props.subtitle }}</h5>
+      <h5 class="card-title">{{ props.title }}</h5>
+      <h6 class="card-subtitle mb-2 small opacity-75">{{ props.subtitle }}</h6>
     </div>
   </div>
 </template>

@@ -1,13 +1,16 @@
 import { v4 } from 'uuid'
 import moment from 'moment'
-import { ExerciseType, type Exercise, type Video, type VideoTag } from '@/types'
+import {
+  ExerciseType,
+  type Block,
+  type Exercise,
+  type Set,
+  type Video,
+  type VideoTag,
+  type Week,
+  type Workout
+} from '@/types'
 import exercises from '@/api/fixtures/exercises'
-
-const VIDEOS_PER_WORKOUT = 3
-const WORKOUTS_PER_WEEK = 5
-const WEEKS_PER_BLOCK = 4
-const BLOCKS = 3
-const VIDEOS = VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK * WEEKS_PER_BLOCK * BLOCKS
 
 type ExerciseProbability = {
   [type in ExerciseType]: {
@@ -19,6 +22,12 @@ type ExerciseProbability = {
 type TagProbability = {
   [name in VideoTag]: number
 }
+
+const VIDEOS_PER_WORKOUT = 3
+const WORKOUTS_PER_WEEK = 5
+const WEEKS_PER_BLOCK = 4
+const BLOCKS = 3
+const VIDEOS = VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK * WEEKS_PER_BLOCK * BLOCKS
 
 const exerciseProbability: ExerciseProbability = {
   [ExerciseType.Lift]: {
@@ -62,9 +71,10 @@ const pickExercise = (): Exercise | null => {
 
 let video: Video | null
 let date = moment('2024-02-08')
-let blockId = v4()
-let weekId = v4()
-let workoutId = v4()
+let block: Block = { id: '', index: 0 }
+let week: Week = { id: '', index: 0 }
+let workout: Workout = { id: '', index: 0 }
+let set: Set = { id: '', index: 0 }
 const videos: Video[] = []
 const videoTags: VideoTag[] = ['pass', 'fail', 'review', 'comment', 'great', 'pb']
 
@@ -75,16 +85,21 @@ const generateVideo = (): Video | null => {
       : date.add(1, 'day').startOf('day')
 
   if (videos.length % (VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK * WEEKS_PER_BLOCK) === 0) {
-    blockId = v4()
-    weekId = v4()
-    workoutId = v4()
+    block = { id: v4(), index: block.index + 1, name: `Block #${block.index + 1}` }
+    week = { id: v4(), index: 0 }
+    workout = { id: v4(), index: 0 }
   }
   if (videos.length % (VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK) === 0) {
-    weekId = v4()
-    workoutId = v4()
+    week = { id: v4(), index: week.index + 1, name: `Semaine #${week.index + 1}` }
+    workout = { id: v4(), index: 0 }
   }
   if (videos.length % VIDEOS_PER_WORKOUT === 0) {
-    workoutId = v4()
+    workout = { id: v4(), index: workout.index + 1, name: `Séance #${workout.index + 1}` }
+    set = { id: v4(), index: 1, name: `Série #1` }
+    date.add(1, 'day').startOf('day')
+  } else {
+    set = { id: v4(), index: set.index + 1, name: `Série #${set.index + 1}` }
+    date.add(15, 'minutes').clone()
   }
 
   const id = v4()
@@ -92,14 +107,15 @@ const generateVideo = (): Video | null => {
 
   return exercise
     ? {
-        blockId,
+        block,
         date: date.toISOString(),
         id,
         exercise,
+        set,
         tags: videoTags.filter((tag) => Math.random() <= tagProbability[tag]),
         thumbnail: `https://picsum.photos/seed/${id}/500`,
-        weekId,
-        workoutId
+        week,
+        workout
       }
     : null
 }

@@ -4,7 +4,7 @@ import { type Video } from '@/types'
 import PIcon from '@/components/icons/PIcon.vue'
 import PTagIcon from '@/components/icons/PTagIcon.vue'
 import { useImageDataURLQuery } from '@/composables/useImageDataURLQuery'
-import FadeOverTransition from '@/components/transitions/FadeOverTransition.vue'
+import PFadeOverTransition from '@/components/transitions/PFadeOverTransition.vue'
 
 export type PVideoListItemProps = {
   video: Video
@@ -27,7 +27,7 @@ watch<boolean>(
 
 <template>
   <div class="position-relative">
-    <FadeOverTransition>
+    <PFadeOverTransition>
       <div
         v-if="props.visible && data"
         class="card ratio ratio-1x1 border border-0 rounded-0"
@@ -48,12 +48,12 @@ watch<boolean>(
           <PIcon
             :path="isError ? 'mdiVideoOff' : 'mdiVideo'"
             :class="{
-              'text-secondary': !isError,
+              'text-secondary opacity-25': !isError,
               'text-danger': isError
             }"
           />
         </div>
       </div>
-    </FadeOverTransition>
+    </PFadeOverTransition>
   </div>
 </template>

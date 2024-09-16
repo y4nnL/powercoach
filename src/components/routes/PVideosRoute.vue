@@ -9,16 +9,19 @@ import { useVideosQuery } from '@/composables/useVideosQuery'
 import { Scale } from '@/types'
 
 const { t } = useI18n()
+
 const videosQuery = useVideosQuery()
 
 const scale = ref<Scale>(Scale.All)
+
+const title = ref<string>('pouet')
 </script>
 
 <template>
   <PLoader :query="videosQuery">
     <template #default="{ data: videos }">
-      <PVideoListToolbar class="sticky-top bg-transparent" />
-      <PVideoList v-model:scale="scale" :videos="videos" />
+      <PVideoListToolbar class="sticky-top bg-transparent" :title="title" />
+      <PVideoList v-model:scale="scale" @update:title="(t) => (title = t)" :videos="videos" />
       <Teleport to="#fixed-bottom">
         <PScaleButtonGroup
           class="position-relative start-50 translate-middle-x mb-2"
