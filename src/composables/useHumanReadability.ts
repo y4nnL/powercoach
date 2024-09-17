@@ -1,11 +1,14 @@
 import { useI18n } from 'vue-i18n'
-import { type Block, type Video, type Week } from '@/types'
+import { type Block, type Video, type Week, type Workout } from '@/types'
 
 export type HumanReadability = {
+  getVideoDate(video: Video): string
   getBlockName(block: Block): string
   getBlockScaleDate(videos: Video[]): string
   getWeekName(week: Week): string
   getWeekScaleDate(videos: Video[]): string
+  getWorkoutName(workout: Workout): string
+  getWorkoutScaleDate(videos: Video[]): string
 }
 
 export function useHumanReadability(): HumanReadability {
@@ -34,7 +37,7 @@ export function useHumanReadability(): HumanReadability {
   }
 
   function getBlockName(block: Block): string {
-    return block.name ?? `${t('common_block')} ${block.index + 1}`
+    return block.name ?? `${t('common_block')} ${block.index}`
   }
 
   function getBlockScaleDate(videos: Video[]): string {
@@ -52,7 +55,7 @@ export function useHumanReadability(): HumanReadability {
   }
 
   function getWeekName(week: Week): string {
-    return week.name ?? `${t('common_week')} ${week.index + 1}`
+    return week.name ?? `${t('common_week')} ${week.index}`
   }
 
   function getWeekScaleDate(videos: Video[]): string {
@@ -76,10 +79,46 @@ export function useHumanReadability(): HumanReadability {
     })
   }
 
+  function getWorkoutName(workout: Workout): string {
+    return workout.name ?? `${t('common_workout')} ${workout.index}`
+  }
+
+  function getWorkoutScaleDate(videos: Video[]): string {
+    const { first, last } = getFirstAndLastDates(videos)
+
+    if (first === last) {
+      return t('date_on', { date: format(first) })
+    }
+
+    if (first.getFullYear() !== last.getFullYear()) {
+      return t('date_fromTo', { from: format(first), to: format(last) })
+    }
+
+    if (first.getMonth() !== last.getMonth()) {
+      return t('date_fromTo', { from: format(first, { year: false }), to: format(last) })
+    }
+
+    if (first.getDate() !== last.getDate()) {
+      return t('date_fromTo', {
+        from: format(first, { year: false, month: false }),
+        to: format(last)
+      })
+    }
+
+    return t('date_on', { date: format(first) })
+  }
+
+  function getVideoDate(video: Video): string {
+    return format(new Date(video.date))
+  }
+
   return {
+    getVideoDate,
     getBlockName,
     getBlockScaleDate,
     getWeekName,
-    getWeekScaleDate
+    getWeekScaleDate,
+    getWorkoutName,
+    getWorkoutScaleDate
   }
 }

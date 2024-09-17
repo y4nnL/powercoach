@@ -85,20 +85,20 @@ const generateVideo = (): Video | null => {
       : date.add(1, 'day').startOf('day')
 
   if (videos.length % (VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK * WEEKS_PER_BLOCK) === 0) {
-    block = { id: v4(), index: block.index + 1, name: `Block #${block.index + 1}` }
+    block = { id: v4(), index: block.index + 1 }
     week = { id: v4(), index: 0 }
     workout = { id: v4(), index: 0 }
   }
   if (videos.length % (VIDEOS_PER_WORKOUT * WORKOUTS_PER_WEEK) === 0) {
-    week = { id: v4(), index: week.index + 1, name: `Semaine #${week.index + 1}` }
+    week = { id: v4(), index: week.index + 1 }
     workout = { id: v4(), index: 0 }
   }
   if (videos.length % VIDEOS_PER_WORKOUT === 0) {
-    workout = { id: v4(), index: workout.index + 1, name: `Séance #${workout.index + 1}` }
-    set = { id: v4(), index: 1, name: `Série #1` }
+    workout = { id: v4(), index: workout.index + 1 }
+    set = { id: v4(), index: 1 }
     date.add(1, 'day').startOf('day')
   } else {
-    set = { id: v4(), index: set.index + 1, name: `Série #${set.index + 1}` }
+    set = { id: v4(), index: set.index + 1 }
     date.add(15, 'minutes').clone()
   }
 

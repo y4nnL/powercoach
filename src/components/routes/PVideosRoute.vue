@@ -14,14 +14,25 @@ const videosQuery = useVideosQuery()
 
 const scale = ref<Scale>(Scale.All)
 
-const title = ref<string>('pouet')
+const title = ref<string | undefined>()
+
+const subtitle = ref<string | undefined>()
 </script>
 
 <template>
   <PLoader :query="videosQuery">
     <template #default="{ data: videos }">
-      <PVideoListToolbar class="sticky-top bg-transparent" :title="title" />
-      <PVideoList v-model:scale="scale" @update:title="(t) => (title = t)" :videos="videos" />
+      <PVideoListToolbar class="sticky-top" :title="title" :subtitle="subtitle" />
+      <PVideoList
+        v-model:scale="scale"
+        :videos="videos"
+        @update:title="
+          (newTitle, newSubtitle) => {
+            title = newTitle
+            subtitle = newSubtitle
+          }
+        "
+      />
       <Teleport to="#fixed-bottom">
         <PScaleButtonGroup
           class="position-relative start-50 translate-middle-x mb-2"

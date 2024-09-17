@@ -1,3 +1,4 @@
+import { camelize } from 'vue'
 import type { Directive, DirectiveBinding } from 'vue'
 
 const IMMEDIATELY_VISIBLE_TIME = 200
@@ -8,37 +9,57 @@ const observers: Record<string, IntersectionObserver> = {}
 
 let uid: number = 1
 
-function mounted(element: HTMLElement, binding: DirectiveBinding<() => any>) {
-  element.dataset.pIntersect = String(uid++)
+function key(binding: DirectiveBinding): string {
+  const modifiers = Object.entries(binding.modifiers)
+    .flatMap(([m, v]) => `${m}-${v}`)
+    .join('-')
+  return camelize(['p', 'intersect', modifiers].join('-'))
+}
+
+function setKey(element: HTMLElement, binding: DirectiveBinding) {
+  element.dataset[key(binding)] = String(uid++)
+}
+
+function getKey(element: HTMLElement, binding: DirectiveBinding): string {
+  return element.dataset[key(binding)]!
+}
+
+function mounted(element: HTMLElement, binding: DirectiveBinding<(visible?: boolean) => any>) {
+  setKey(element, binding)
   const mountedAt = Date.now()
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(({ isIntersecting }) => {
       const trigger = () => {
-        binding.value?.()
-        unmounted(element)
+        binding.value?.(isIntersecting)
+        if (!binding.modifiers.keep) {
+          unmounted(element, binding)
+        }
       }
       if (isIntersecting) {
-        Date.now() - mountedAt < IMMEDIATELY_VISIBLE_TIME
+        binding.modifiers.immediate || Date.now() - mountedAt < IMMEDIATELY_VISIBLE_TIME
           ? trigger()
-          : (timeouts[element.dataset.pIntersect!] = window.setTimeout(trigger, TIME_IN_VIEWPORT))
+          : (timeouts[getKey(element, binding)] = window.setTimeout(trigger, TIME_IN_VIEWPORT))
       } else {
-        window.clearTimeout(timeouts[element.dataset.pIntersect!])
-        delete timeouts[element.dataset.pIntersect!]
+        if (binding.modifiers.both) {
+          trigger()
+        }
+        window.clearTimeout(timeouts[getKey(element, binding)])
+        delete timeouts[getKey(element, binding)]
       }
     })
   })
   observer.observe(element)
-  observers[element.dataset.pIntersect!] = observer
+  observers[getKey(element, binding)] = observer
 }
 
-function unmounted(element: HTMLElement) {
-  const observer = observers[element.dataset.pIntersect!]
+function unmounted(element: HTMLElement, binding: DirectiveBinding) {
+  const observer = observers[getKey(element, binding)]
   if (observer) {
     observer.unobserve(element)
     observer.disconnect()
-    delete observers[element.dataset.pIntersect!]
-    delete timeouts[element.dataset.pIntersect!]
-    delete element.dataset.pIntersect
+    delete observers[getKey(element, binding)]
+    delete timeouts[getKey(element, binding)]
+    delete element.dataset[key(binding)]
   }
 }
 
