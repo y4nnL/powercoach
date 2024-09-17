@@ -42,7 +42,7 @@ const more = computed<number>(() => props.videos.length - props.preview)
         </template>
       </PVideoListItem>
       <div
-        class="PVideoListItemGroupTitle position-absolute top-0 start-0 pt-2 w-100 h-100 bg-dark bg-gradient text-bg-dark"
+        class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 h-100 bg-dark bg-gradient text-bg-dark"
         style="
           --bs-gradient: linear-gradient(0, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.6));
           --bs-bg-opacity: 0;
@@ -62,7 +62,7 @@ const more = computed<number>(() => props.videos.length - props.preview)
 .card-subtitle {
   text-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
 }
-.PVideoListItemGroupTitle {
+.PVideoListGroupTitle {
   padding-left: 1rem !important;
 }
 </style>

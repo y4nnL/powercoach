@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { Scale, type Block, type Video, type Week, type Workout } from '@/types'
 import PVideoListItem from '@/components/containment/lists/video/PVideoListItem.vue'
-import PVideoListItemGroup from '@/components/containment/lists/video/PVideoListItemGroup.vue'
+import PVideoListGroup from '@/components/containment/lists/video/PVideoListGroup.vue'
 import PVideoListDivider from '@/components/containment/lists/video/PVideoListDivider.vue'
 import vIntersect from '@/directives/PIntersect'
 import { useHumanReadability } from '@/composables/useHumanReadability'
@@ -145,12 +145,12 @@ watch(
     <template v-if="groups">
       <div v-if="scale === Scale.Block" key="block" class="row">
         <div class="col col-12" v-for="group in groups" :key="group.title">
-          <PVideoListItemGroup
+          <PVideoListGroup
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
             @click="emit('update:scale', Scale.Week)"
-          ></PVideoListItemGroup>
+          ></PVideoListGroup>
         </div>
       </div>
       <div v-else-if="scale === Scale.Week" key="week" class="row">
@@ -159,7 +159,7 @@ watch(
             v-if="i > 0 && group.block.id !== groups[i - 1].block.id"
             :title="getBlockName(group.block)"
           ></PVideoListDivider>
-          <PVideoListItemGroup
+          <PVideoListGroup
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
@@ -170,7 +170,7 @@ watch(
               (visibility: boolean) => (titleVisibilities[group.week.id] = visibility)
             "
             @click="emit('update:scale', Scale.Workout)"
-          ></PVideoListItemGroup>
+          ></PVideoListGroup>
         </div>
       </div>
       <div v-else-if="scale === Scale.Workout" key="workout" class="row">
@@ -180,7 +180,7 @@ watch(
             :title="getWeekName(group.week)"
             :subtitle="getBlockName(group.block)"
           ></PVideoListDivider>
-          <PVideoListItemGroup
+          <PVideoListGroup
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
@@ -192,7 +192,7 @@ watch(
               (visibility: boolean) => (titleVisibilities[group.workout.id] = visibility)
             "
             @click="emit('update:scale', Scale.All)"
-          ></PVideoListItemGroup>
+          ></PVideoListGroup>
         </div>
       </div>
     </template>
