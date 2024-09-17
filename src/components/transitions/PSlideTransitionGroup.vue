@@ -22,17 +22,17 @@ const emit = defineEmits<{
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition:
-    transform 0.4s ease-out,
-    opacity 0.4s;
+    transform 0.5s ease-out,
+    opacity 0.5s 0.05s;
 }
 .slide-up-enter-from,
 .slide-down-leave-to {
-  transform: translateY(-40%);
+  transform: translateY(-50%);
   opacity: 0;
 }
 .slide-up-leave-to,
 .slide-down-enter-from {
-  transform: translateY(40%);
+  transform: translateY(50%);
   opacity: 0;
 }
 

@@ -43,8 +43,11 @@ watch<boolean>(
           </div>
         </slot>
       </div>
-      <div v-else class="ratio ratio-1x1" key="placeholder">
-        <div class="d-flex justify-content-center align-items-center bg-body-tertiary">
+      <div v-else class="ratio ratio-1x1 bg-dark" key="placeholder">
+        <div
+          class="d-flex justify-content-center align-items-center bg-dark"
+          style="--bs-dark-rgb: 53, 57, 61"
+        >
           <PIcon
             :path="isError ? 'mdiVideoOff' : 'mdiVideo'"
             :class="{

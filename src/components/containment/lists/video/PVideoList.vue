@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Scale, type Block, type Video, type Week, type Workout } from '@/types'
-import PVideoListItem from '@/components/containment/lists/PVideoListItem.vue'
-import PVideoListItemGroup from '@/components/containment/lists/PVideoListItemGroup.vue'
+import PVideoListItem from '@/components/containment/lists/video/PVideoListItem.vue'
+import PVideoListItemGroup from '@/components/containment/lists/video/PVideoListItemGroup.vue'
+import PVideoListDivider from '@/components/containment/lists/video/PVideoListDivider.vue'
 import vIntersect from '@/directives/PIntersect'
 import { useHumanReadability } from '@/composables/useHumanReadability'
 import { useMainScroll } from '@/composables/useMainScroll'
@@ -123,11 +124,11 @@ watch(
 </script>
 
 <template>
-  <div class="container-fluid" ref="container">
-    <div v-if="scale === Scale.All" key="all" class="row gy-0">
+  <div class="container-fluid PVideoList" ref="container">
+    <div v-if="scale === Scale.All" key="all" class="row">
       <PVideoListItem
         v-for="video in props.videos"
-        class="col-4 col-md-2 gx-0"
+        class="col col-4 col-md-2"
         :key="video.id"
         :video="video"
         :visible="imageVisibilities[video.id] ?? false"
@@ -142,8 +143,8 @@ watch(
       />
     </div>
     <template v-if="groups">
-      <div v-if="scale === Scale.Block" key="block" class="row gy-0">
-        <div class="col-12 mb-5" v-for="group in groups" :key="group.title">
+      <div v-if="scale === Scale.Block" key="block" class="row">
+        <div class="col col-12" v-for="group in groups" :key="group.title">
           <PVideoListItemGroup
             :videos="group.videos"
             :title="group.title"
@@ -152,8 +153,12 @@ watch(
           ></PVideoListItemGroup>
         </div>
       </div>
-      <div v-else-if="scale === Scale.Week" key="week" class="row gy-0">
-        <div class="col-12 mb-2" v-for="group in groups" :key="group.title">
+      <div v-else-if="scale === Scale.Week" key="week" class="row">
+        <div class="col col-12" v-for="(group, i) in groups" :key="group.title">
+          <PVideoListDivider
+            v-if="i > 0 && group.block.id !== groups[i - 1].block.id"
+            :title="getBlockName(group.block)"
+          ></PVideoListDivider>
           <PVideoListItemGroup
             :videos="group.videos"
             :title="group.title"
@@ -168,8 +173,13 @@ watch(
           ></PVideoListItemGroup>
         </div>
       </div>
-      <div v-else-if="scale === Scale.Workout" key="workout" class="row gy-0">
-        <div class="col-12 mb-2" v-for="group in groups" :key="group.title">
+      <div v-else-if="scale === Scale.Workout" key="workout" class="row">
+        <div class="col col-12" v-for="(group, i) in groups" :key="group.title">
+          <PVideoListDivider
+            v-if="i > 0 && group.week.id !== groups[i - 1].week.id"
+            :title="getWeekName(group.week)"
+            :subtitle="getBlockName(group.block)"
+          ></PVideoListDivider>
           <PVideoListItemGroup
             :videos="group.videos"
             :title="group.title"
@@ -189,3 +199,14 @@ watch(
   </div>
   <RouterView />
 </template>
+
+<style>
+.PVideoList,
+.PVideoList .container,
+.PVideoList .container-fluid,
+.PVideoList .row,
+.PVideoList .col {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+</style>

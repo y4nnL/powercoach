@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, toRefs, watch } from 'vue'
+import { throttle } from 'lodash'
 import { useMainScroll } from '@/composables/useMainScroll'
 import PSlideTransitionGroup from '@/components/transitions/PSlideTransitionGroup.vue'
 
@@ -7,6 +8,8 @@ export type PVideoListToolbarProps = {
   title?: string
   subtitle?: string
 }
+
+const TRANSITION_THROTTLE = 500
 
 const props = defineProps<PVideoListToolbarProps>()
 
@@ -16,12 +19,12 @@ const titles = ref<(string | undefined)[]>([props.title])
 
 watch(
   () => props.title,
-  (newTitle) => (titles.value = [newTitle])
+  throttle((newTitle) => (titles.value = [newTitle]), TRANSITION_THROTTLE)
 )
 </script>
 
 <template>
-  <nav class="navbar" :class="{ backdrop: Boolean(title), 'bg-transparent': !Boolean(title) }">
+  <nav class="navbar navbar-dark bg-dark overflow-hidden">
     <div class="container-fluid">
       <a class="navbar-brand position-relative" href="#">
         &nbsp;
@@ -44,7 +47,7 @@ watch(
   </nav>
 </template>
 
-<style>
+<style scoped>
 .backdrop {
   backdrop-filter: blur(50px);
 }

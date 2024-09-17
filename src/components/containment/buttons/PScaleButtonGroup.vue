@@ -23,15 +23,13 @@ const scaleModel = defineModel<Scale>('scale', { required: true })
 <template>
   <div class="btn-group">
     <button
-      v-for="(scale, index) in props.scales"
+      v-for="scale in props.scales"
       type="button"
-      class="btn"
+      class="btn rounded-0"
       :key="scale"
       :class="{
-        'rounded-start-pill': !index,
-        'rounded-end-pill': index === props.scales.length - 1,
         'btn-primary': scaleModel === scale,
-        'btn-secondary': scaleModel !== scale
+        'btn-dark': scaleModel !== scale
       }"
       @click="emit('update:scale', scale)"
     >
