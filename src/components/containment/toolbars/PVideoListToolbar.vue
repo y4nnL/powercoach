@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, toRefs, watch } from 'vue'
 import { throttle } from 'lodash'
-import { useMainScroll } from '@/composables/useMainScroll'
 import PSlideTransitionGroup from '@/components/transitions/PSlideTransitionGroup.vue'
+import { useMainScroll } from '@/composables/useMainScroll'
+import { useRefStore } from '@/stores/ref'
 
 export type PVideoListToolbarProps = {
   title?: string
@@ -17,14 +18,18 @@ const { top: scrollingUp, bottom: scrollingDown } = toRefs(useMainScroll().direc
 
 const titles = ref<(string | undefined)[]>([props.title])
 
+const container = ref<HTMLElement | null>(null)
+
 watch(
   () => props.title,
   throttle((newTitle) => (titles.value = [newTitle]), TRANSITION_THROTTLE)
 )
+
+useRefStore().set('toolbar', container)
 </script>
 
 <template>
-  <nav class="navbar navbar-dark bg-dark overflow-hidden">
+  <nav class="navbar navbar-dark bg-dark overflow-hidden" ref="container">
     <div class="container-fluid">
       <a class="navbar-brand position-relative" href="#">
         &nbsp;
@@ -48,9 +53,6 @@ watch(
 </template>
 
 <style scoped>
-.backdrop {
-  backdrop-filter: blur(50px);
-}
 .subtitle {
   position: relative;
   top: -0.2rem;

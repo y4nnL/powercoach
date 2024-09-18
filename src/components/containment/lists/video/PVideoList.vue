@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Scale, type Block, type Video, type Week, type Workout } from '@/types'
 import PVideoListItem from '@/components/containment/lists/video/PVideoListItem.vue'
 import PVideoListGroup from '@/components/containment/lists/video/PVideoListGroup.vue'
@@ -7,6 +7,7 @@ import PVideoListDivider from '@/components/containment/lists/video/PVideoListDi
 import vIntersect from '@/directives/PIntersect'
 import { useHumanReadability } from '@/composables/useHumanReadability'
 import { useMainScroll } from '@/composables/useMainScroll'
+import { useRefStore } from '@/stores/ref'
 
 export type PVideoListProps = {
   videos: Video[]
@@ -19,6 +20,12 @@ type VideoGroup = {
   videos: Video[]
   week: Week
   workout: Workout
+}
+
+type CreateVideoGroup = {
+  key: (video: Video) => string
+  subtitle: (group: Omit<VideoGroup, 'subtitle' | 'title'>) => string
+  title: (group: Omit<VideoGroup, 'subtitle' | 'title'>) => string
 }
 
 const scale = defineModel<Scale>('scale', { required: true })
@@ -36,13 +43,13 @@ const titleVisibilities = ref<Record<string, boolean>>({})
 const container = ref<HTMLElement | null>(null)
 
 const {
-  getBlockName,
-  getBlockScaleDate,
-  getVideoDate,
-  getWeekName,
-  getWeekScaleDate,
-  getWorkoutName,
-  getWorkoutScaleDate
+  blockName,
+  blockScaleDate,
+  videoDate,
+  weekName,
+  weekScaleDate,
+  workoutName,
+  workoutScaleDate
 } = useHumanReadability()
 
 const { y: scrollY } = useMainScroll()
@@ -51,147 +58,164 @@ const groups = computed<VideoGroup[] | null>(() => {
   if (scale.value === Scale.Block) {
     emit('update:title')
     return createVideoGroups({
-      index: (video) => video.block.id,
-      subtitle: (videos) => getBlockScaleDate(videos),
-      title: ([video]) => getBlockName(video.block)
+      key: (video) => video.block.id,
+      subtitle: ({ videos }) => blockScaleDate(videos),
+      title: ({ block }) => blockName(block)
     })
   }
 
   if (scale.value === Scale.Week) {
     const videoGroups = createVideoGroups({
-      index: (video) => [video.block.id, video.week.id].join('-'),
-      subtitle: (videos) => getWeekScaleDate(videos),
-      title: ([video]) => getWeekName(video.week)
+      key: (video) => [video.block.id, video.week.id].join('-'),
+      subtitle: ({ videos }) => weekScaleDate(videos),
+      title: ({ week }) => weekName(week)
     })
-    emit('update:title', getBlockName(videoGroups[0].block))
+    const [{ block }] = videoGroups
+    emit('update:title', blockName(block))
     return videoGroups
   }
 
   if (scale.value === Scale.Workout) {
     const videoGroups = createVideoGroups({
-      index: (video) => [video.block.id, video.week.id, video.workout.id].join('-'),
-      subtitle: (videos) => getWorkoutScaleDate(videos),
-      title: ([video]) => getWorkoutName(video.workout)
+      key: (video) => [video.block.id, video.week.id, video.workout.id].join('-'),
+      subtitle: ({ videos }) => workoutScaleDate(videos),
+      title: ({ workout }) => workoutName(workout)
     })
-    emit('update:title', getWeekName(videoGroups[0].week), getBlockName(videoGroups[0].block))
+    const [{ week, block }] = videoGroups
+    emit('update:title', weekName(week), blockName(block))
     return videoGroups
   }
 
-  emit('update:title', getVideoDate(props.videos[0]))
+  emit('update:title', videoDate(props.videos[0]))
   return null
 })
 
-function createVideoGroups({
-  index,
-  title,
-  subtitle
-}: {
-  index: (video: Video) => string
-  title: (videos: Video[]) => string
-  subtitle: (videos: Video[]) => string
-}): VideoGroup[] {
+function createVideoGroups({ key, title, subtitle }: CreateVideoGroup): VideoGroup[] {
   return Object.entries(
     props.videos.reduce<Record<string, Video[]>>(
-      (blocks, video) => ({
-        ...blocks,
-        [index(video)]: (blocks[index(video)] ?? []).concat(video)
-      }),
+      (group, video) => ({ ...group, [key(video)]: [...(group[key(video)] ?? []), video] }),
       {}
     )
-  ).map(([, videos]) => ({
-    block: videos[0].block,
-    subtitle: subtitle(videos),
-    title: title(videos),
-    videos,
-    week: videos[0].week,
-    workout: videos[0].workout
-  }))
+  ).map(([, videos]) => {
+    const [{ block, week, workout }] = videos
+    const group = { block, videos, week, workout }
+    return {
+      ...group,
+      subtitle: subtitle(group),
+      title: title(group)
+    }
+  })
 }
 
-watch(
-  () => scrollY.value,
-  () => {
-    const elements = container.value?.querySelectorAll('[data-visibility-id][data-title]')
-    const titles = Array.from(elements as unknown as HTMLElement[])
-      .filter((e) => titleVisibilities.value[e.dataset.visibilityId!])
-      .map((e) => [e.dataset.title, e.dataset.subtitle])
-    if (titles.length) {
-      const [title, subtitle] = titles[0]
-      emit('update:title', title, subtitle)
-    }
+function updateTitle() {
+  const elements = container.value?.querySelectorAll('[data-visibility-id][data-title]')
+  const titleTuples = Array.from(elements as unknown as HTMLElement[])
+    .filter((el) => titleVisibilities.value[el.dataset.visibilityId!])
+    .map((el) => [el.dataset.title, el.dataset.subtitle])
+  if (titleTuples.length) {
+    const [title, subtitle] = titleTuples[0]
+    emit('update:title', title, subtitle)
   }
-)
+}
+
+function zoomIn(scale: Scale, entity: Block | Week | Workout | Video) {
+  emit('update:scale', scale)
+  const observer = new MutationObserver(() => {
+    const el = container.value!.querySelector(`[id="${entity.id}"]`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+      observer.disconnect()
+    }
+  })
+  observer.observe(container.value!, {
+    subtree: true,
+    childList: true
+  })
+}
+
+function scrollToTop() {
+  scrollY.value = 0
+}
+
+function setMainScrollPaddingTop() {
+  const main = useRefStore().get('main')
+  const toolbar = useRefStore().get('toolbar')
+  if (main.value && toolbar.value) {
+    main.value.style.scrollPaddingTop = `${toolbar.value.clientHeight}px`
+  }
+}
+
+onMounted(setMainScrollPaddingTop)
+watch(() => scrollY.value, updateTitle)
+watch(() => scale.value, scrollToTop)
 </script>
 
 <template>
   <div class="container-fluid PVideoList" ref="container">
     <div v-if="scale === Scale.All" key="all" class="row">
       <PVideoListItem
-        v-for="video in props.videos"
+        v-for="{ id, ...video } in props.videos"
         class="col col-4 col-md-2"
-        :key="video.id"
-        :video="video"
-        :visible="imageVisibilities[video.id] ?? false"
-        :data-visibility-id="video.id"
-        :data-title="getVideoDate(video)"
-        v-intersect="() => (imageVisibilities[video.id] = true)"
-        v-intersect.both.keep.immediate="
-          (visibility: boolean) => {
-            titleVisibilities[video.id] = visibility
-          }
-        "
+        :id="id"
+        :key="id"
+        :video="{ id, ...video }"
+        :visible="imageVisibilities[id] ?? false"
+        :data-visibility-id="id"
+        :data-title="videoDate({ id, ...video })"
+        v-intersect="() => (imageVisibilities[id] = true)"
+        v-intersect.both.keep.immediate="(is: boolean) => (titleVisibilities[id] = is)"
       />
     </div>
     <template v-if="groups">
       <div v-if="scale === Scale.Block" key="block" class="row">
-        <div class="col col-12" v-for="group in groups" :key="group.title">
+        <div class="col col-12" v-for="(group, i) in groups" :key="group.block.id">
+          <PVideoListDivider v-if="i > 0"></PVideoListDivider>
           <PVideoListGroup
+            :id="group.block.id"
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
-            @click="emit('update:scale', Scale.Week)"
+            @click="zoomIn(Scale.Week, group.week)"
           ></PVideoListGroup>
         </div>
       </div>
       <div v-else-if="scale === Scale.Week" key="week" class="row">
-        <div class="col col-12" v-for="(group, i) in groups" :key="group.title">
+        <div class="col col-12" v-for="({ week, ...group }, i) in groups" :key="week.id">
           <PVideoListDivider
-            v-if="i > 0 && group.block.id !== groups[i - 1].block.id"
-            :title="getBlockName(group.block)"
+            v-if="i > 0"
+            :title="group.block.id !== groups[i - 1].block.id ? blockName(group.block) : undefined"
           ></PVideoListDivider>
           <PVideoListGroup
+            :id="week.id"
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
             :preview="6"
-            :data-visibility-id="group.week.id"
-            :data-title="getBlockName(group.block)"
-            v-intersect.both.keep.immediate="
-              (visibility: boolean) => (titleVisibilities[group.week.id] = visibility)
-            "
-            @click="emit('update:scale', Scale.Workout)"
+            :data-visibility-id="week.id"
+            :data-title="blockName(group.block)"
+            v-intersect.both.keep.immediate="(is: boolean) => (titleVisibilities[week.id] = is)"
+            @click="zoomIn(Scale.Workout, group.workout)"
           ></PVideoListGroup>
         </div>
       </div>
       <div v-else-if="scale === Scale.Workout" key="workout" class="row">
-        <div class="col col-12" v-for="(group, i) in groups" :key="group.title">
+        <div class="col col-12" v-for="({ workout, ...group }, i) in groups" :key="workout.id">
           <PVideoListDivider
-            v-if="i > 0 && group.week.id !== groups[i - 1].week.id"
-            :title="getWeekName(group.week)"
-            :subtitle="getBlockName(group.block)"
+            v-if="i > 0"
+            :title="group.week.id !== groups[i - 1].week.id ? weekName(group.week) : undefined"
+            :subtitle="group.week.id !== groups[i - 1].week.id ? blockName(group.block) : undefined"
           ></PVideoListDivider>
           <PVideoListGroup
+            :id="workout.id"
             :videos="group.videos"
             :title="group.title"
             :subtitle="group.subtitle"
             :preview="3"
-            :data-visibility-id="group.workout.id"
-            :data-title="getWeekName(group.week)"
-            :data-subtitle="getBlockName(group.block)"
-            v-intersect.both.keep.immediate="
-              (visibility: boolean) => (titleVisibilities[group.workout.id] = visibility)
-            "
-            @click="emit('update:scale', Scale.All)"
+            :data-visibility-id="workout.id"
+            :data-title="weekName(group.week)"
+            :data-subtitle="blockName(group.block)"
+            v-intersect.both.keep.immediate="(is: boolean) => (titleVisibilities[workout.id] = is)"
+            @click="zoomIn(Scale.All, group.videos[0])"
           ></PVideoListGroup>
         </div>
       </div>

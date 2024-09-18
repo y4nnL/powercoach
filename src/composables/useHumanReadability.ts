@@ -2,13 +2,13 @@ import { useI18n } from 'vue-i18n'
 import { type Block, type Video, type Week, type Workout } from '@/types'
 
 export type HumanReadability = {
-  getVideoDate(video: Video): string
-  getBlockName(block: Block): string
-  getBlockScaleDate(videos: Video[]): string
-  getWeekName(week: Week): string
-  getWeekScaleDate(videos: Video[]): string
-  getWorkoutName(workout: Workout): string
-  getWorkoutScaleDate(videos: Video[]): string
+  blockName(block: Block): string
+  blockScaleDate(videos: Video[]): string
+  videoDate(video: Video): string
+  weekName(week: Week): string
+  weekScaleDate(videos: Video[]): string
+  workoutName(workout: Workout): string
+  workoutScaleDate(videos: Video[]): string
 }
 
 export function useHumanReadability(): HumanReadability {
@@ -113,12 +113,12 @@ export function useHumanReadability(): HumanReadability {
   }
 
   return {
-    getVideoDate,
-    getBlockName,
-    getBlockScaleDate,
-    getWeekName,
-    getWeekScaleDate,
-    getWorkoutName,
-    getWorkoutScaleDate
+    blockName: getBlockName,
+    blockScaleDate: getBlockScaleDate,
+    videoDate: getVideoDate,
+    weekName: getWeekName,
+    weekScaleDate: getWeekScaleDate,
+    workoutName: getWorkoutName,
+    workoutScaleDate: getWorkoutScaleDate
   }
 }
