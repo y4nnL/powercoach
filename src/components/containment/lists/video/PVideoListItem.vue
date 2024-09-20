@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { type Video } from '@/types'
 import PIcon from '@/components/icons/PIcon.vue'
 import PTagIcon from '@/components/icons/PTagIcon.vue'
@@ -19,6 +19,8 @@ const emit = defineEmits<{
 
 const { data, isError, refetch } = useImageDataURLQuery(props.video.thumbnail)
 
+const cached = computed<boolean>(() => Boolean(data.value))
+
 watch<boolean>(
   () => props.visible,
   (visible) => visible && refetch()
@@ -29,7 +31,7 @@ watch<boolean>(
   <div class="position-relative">
     <PFadeOverTransition>
       <div
-        v-if="props.visible && data"
+        v-if="cached || (props.visible && data)"
         class="card ratio ratio-1x1 border border-0 rounded-0"
         key="thumbnail"
         @click="emit('click', props.video)"
