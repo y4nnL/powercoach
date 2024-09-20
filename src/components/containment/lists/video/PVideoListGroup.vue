@@ -28,7 +28,7 @@ const more = computed<number>(() => props.videos.length - props.preview)
         :key="video.id"
         :video="video"
         :visible="visibilities[video.id] ?? false"
-        v-intersect="() => (visibilities[video.id] = true)"
+        v-intersect.delay.visible.once="{ on: () => (visibilities[video.id] = true) }"
       >
         <template #overlay>
           <div

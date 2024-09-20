@@ -4,6 +4,7 @@ import { throttle } from 'lodash'
 import PSlideTransitionGroup from '@/components/transitions/PSlideTransitionGroup.vue'
 import { useMainScroll } from '@/composables/useMainScroll'
 import { useRefStore } from '@/stores/ref'
+import PIcon from '@/components/icons/PIcon.vue'
 
 export type PVideoListToolbarProps = {
   title?: string
@@ -29,9 +30,13 @@ useRefStore().set('toolbar', container)
 </script>
 
 <template>
-  <nav class="navbar navbar-dark bg-dark overflow-hidden" ref="container">
+  <nav
+    class="navbar navbar-dark bg-dark overflow-hidden"
+    ref="container"
+    style="--bs-dark-rgb: 13, 17, 21"
+  >
     <div class="container-fluid">
-      <a class="navbar-brand position-relative" href="#">
+      <a class="navbar-brand position-relative">
         &nbsp;
         <PSlideTransitionGroup
           :direction="scrollingUp ? 'up' : scrollingDown ? 'down' : undefined"
@@ -39,27 +44,15 @@ useRefStore().set('toolbar', container)
         >
           <span
             v-for="title in titles"
-            :key="title"
-            class="position-absolute"
-            :class="{ subtitle: Boolean(subtitle) }"
+            :key="title + (subtitle ?? '')"
+            class="position-absolute d-inline-flex align-items-center"
           >
             {{ title }}
-            <span class="d-block small" v-if="subtitle">{{ subtitle }}</span>
+            <PIcon v-if="subtitle" class="opacity-25" :size="24" :path="'mdiChevronRight'"></PIcon>
+            <span v-if="subtitle">{{ subtitle }}</span>
           </span>
         </PSlideTransitionGroup>
       </a>
     </div>
   </nav>
 </template>
-
-<style scoped>
-.subtitle {
-  position: relative;
-  top: -0.2rem;
-}
-.subtitle .small {
-  position: relative;
-  top: -0.3rem;
-  font-size: 70%;
-}
-</style>

@@ -15,7 +15,7 @@ useRefStore().set('main', main)
 </script>
 
 <template>
-  <div class="vh-100 d-flex flex-column">
+  <div class="vh-100 d-flex flex-column bg-dark" style="--bs-dark-rgb: 13, 17, 21">
     <div ref="main" class="h-100 overflow-scroll">
       <RouterView />
     </div>

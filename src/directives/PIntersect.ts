@@ -1,6 +1,8 @@
 import { camelize } from 'vue'
 import type { Directive, DirectiveBinding } from 'vue'
 
+export type PIntersectProps = { on: (visible?: boolean) => any; options?: IntersectionObserverInit }
+
 const IMMEDIATELY_VISIBLE_TIME = 200
 const TIME_IN_VIEWPORT = 500
 
@@ -11,7 +13,7 @@ let uid: number = 1
 
 function key(binding: DirectiveBinding): string {
   const modifiers = Object.entries(binding.modifiers)
-    .flatMap(([m, v]) => `${m}-${v}`)
+    .flatMap(([modifier, value]) => `${modifier}-${value}`)
     .join('-')
   return camelize(['p', 'intersect', modifiers].join('-'))
 }
@@ -24,30 +26,30 @@ function getKey(element: HTMLElement, binding: DirectiveBinding): string {
   return element.dataset[key(binding)]!
 }
 
-function mounted(element: HTMLElement, binding: DirectiveBinding<(visible?: boolean) => any>) {
+function mounted(element: HTMLElement, binding: DirectiveBinding<PIntersectProps>) {
   setKey(element, binding)
   const mountedAt = Date.now()
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(({ isIntersecting }) => {
       const trigger = () => {
-        binding.value?.(isIntersecting)
-        if (!binding.modifiers.keep) {
+        binding.value?.on?.(isIntersecting)
+        if (binding.modifiers.once) {
           unmounted(element, binding)
         }
       }
       if (isIntersecting) {
-        binding.modifiers.immediate || Date.now() - mountedAt < IMMEDIATELY_VISIBLE_TIME
-          ? trigger()
-          : (timeouts[getKey(element, binding)] = window.setTimeout(trigger, TIME_IN_VIEWPORT))
+        binding.modifiers.delay && Date.now() - mountedAt > IMMEDIATELY_VISIBLE_TIME
+          ? (timeouts[getKey(element, binding)] = window.setTimeout(trigger, TIME_IN_VIEWPORT))
+          : trigger()
       } else {
-        if (binding.modifiers.both) {
+        if (!binding.modifiers.visible) {
           trigger()
         }
         window.clearTimeout(timeouts[getKey(element, binding)])
         delete timeouts[getKey(element, binding)]
       }
     })
-  })
+  }, binding.value.options)
   observer.observe(element)
   observers[getKey(element, binding)] = observer
 }
@@ -63,7 +65,7 @@ function unmounted(element: HTMLElement, binding: DirectiveBinding) {
   }
 }
 
-const PIntersect: Directive<HTMLElement, () => any> = {
+const PIntersect: Directive<HTMLElement, PIntersectProps> = {
   mounted,
   unmounted
 }
