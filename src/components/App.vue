@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import { useRefStore } from '@/stores/ref'
+import { useDebugStore } from '@/stores/debug'
+import PIcon from '@/components/icons/PIcon.vue'
 
 const main = ref<HTMLElement | null>(null)
 
@@ -10,6 +12,8 @@ const pBottomNavigation = ref<InstanceType<typeof PBottomNavigation>>()
 const pBottomNavigationHeight = computed<number>(
   () => pBottomNavigation.value?.container?.clientHeight ?? 0
 )
+
+const { reticle } = useDebugStore()
 
 useRefStore().set('main', main)
 </script>
@@ -26,4 +30,10 @@ useRefStore().set('main', main)
     ></div>
     <PBottomNavigation ref="pBottomNavigation" />
   </div>
+  <PIcon
+    v-if="reticle"
+    :path="'mdiPlus'"
+    class="position-absolute translate-middle text-danger start-50 top-50"
+    style="z-index: 1000000"
+  ></PIcon>
 </template>

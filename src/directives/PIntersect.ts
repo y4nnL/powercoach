@@ -12,10 +12,8 @@ const observers: Record<string, IntersectionObserver> = {}
 let uid: number = 1
 
 function key(binding: DirectiveBinding): string {
-  const modifiers = Object.entries(binding.modifiers)
-    .flatMap(([modifier, value]) => `${modifier}-${value}`)
-    .join('-')
-  return camelize(['p', 'intersect', modifiers].join('-'))
+  const modifiers = Object.entries(binding.modifiers).flatMap(([mod, val]) => `${mod}-${val}`)
+  return camelize(['p', 'intersect', ...modifiers].join('-'))
 }
 
 function setKey(element: HTMLElement, binding: DirectiveBinding) {
@@ -27,6 +25,9 @@ function getKey(element: HTMLElement, binding: DirectiveBinding): string {
 }
 
 function mounted(element: HTMLElement, binding: DirectiveBinding<PIntersectProps>) {
+  if (!binding.value) {
+    return
+  }
   setKey(element, binding)
   const mountedAt = Date.now()
   const observer = new IntersectionObserver((entries) => {

@@ -8,12 +8,16 @@ import vIntersect from '@/directives/PIntersect'
 import { useHumanReadability } from '@/composables/useHumanReadability'
 import { useMainScroll } from '@/composables/useMainScroll'
 import { useRefStore } from '@/stores/ref'
+import PVideoListTransition, {
+  type PVideoListTransitionProps
+} from '@/components/transitions/PVideoListTransition.vue'
 
 export type PVideoListProps = {
   videos: Video[]
 }
 
 type VideoGroup = {
+  anchors: PVideoListTransitionProps['anchors']
   block: Block
   subtitle: string
   title: string
@@ -24,8 +28,8 @@ type VideoGroup = {
 
 type CreateVideoGroup = {
   key: (video: Video) => string
-  subtitle: (group: Omit<VideoGroup, 'subtitle' | 'title'>) => string
-  title: (group: Omit<VideoGroup, 'subtitle' | 'title'>) => string
+  subtitle: (group: Omit<VideoGroup, 'anchors' | 'subtitle' | 'title'>) => string
+  title: (group: Omit<VideoGroup, 'anchors' | 'subtitle' | 'title'>) => string
 }
 
 const scale = defineModel<Scale>('scale', { required: true })
@@ -37,13 +41,15 @@ const emit = defineEmits<{
   'update:title': [title: string | undefined, subtitle: string | undefined]
 }>()
 
-const imageVisibilities = ref<Record<string, boolean>>({})
-const titleVisibilities = ref<Record<string, boolean>>({})
+const intersections = ref<Record<string, boolean>>({})
 
 const container = ref<HTMLElement | null>(null)
 
 const main = useRefStore().get('main')
+
 const toolbar = useRefStore().get('toolbar')
+
+const anchors = ref<PVideoListTransitionProps['anchors']>()
 
 const {
   blockName,
@@ -93,9 +99,20 @@ const groups = computed<VideoGroup[] | null>(() => {
   return null
 })
 
-const titleIntersectionRootMargin = computed<string>(() => {
-  return `-${toolbar.value?.clientHeight ?? 0}px 0px 0px 0px`
+const toolbarHeight = computed<number>(() => {
+  return toolbar.value?.clientHeight ?? 0
 })
+
+const titleIntersectionRootMargin = computed<string>(() => {
+  return `-${toolbarHeight.value}px 0px 0px 0px`
+})
+
+function getIntersectingElements(dataKey: string): HTMLElement[] {
+  const elements = container.value?.querySelectorAll(`[data-intersection-id][data-${dataKey}]`)
+  return Array.from(elements as unknown as HTMLElement[]).filter(
+    (el) => intersections.value[el.dataset.intersectionId!]
+  )
+}
 
 function createVideoGroups({ key, title, subtitle }: CreateVideoGroup): VideoGroup[] {
   return Object.entries(
@@ -108,6 +125,7 @@ function createVideoGroups({ key, title, subtitle }: CreateVideoGroup): VideoGro
     const group = { block, videos, week, workout }
     return {
       ...group,
+      anchors: { block: block.id, week: week.id, workout: workout.id, all: videos[0].id },
       subtitle: subtitle(group),
       title: title(group)
     }
@@ -115,135 +133,174 @@ function createVideoGroups({ key, title, subtitle }: CreateVideoGroup): VideoGro
 }
 
 function updateTitle() {
-  const elements = container.value?.querySelectorAll('[data-visibility-id][data-title]')
-  const titleTuples = Array.from(elements as unknown as HTMLElement[])
-    .filter((el) => titleVisibilities.value[el.dataset.visibilityId!])
-    .map((el) => [el.dataset.title, el.dataset.subtitle])
-  if (titleTuples.length) {
-    const [title, subtitle] = titleTuples[0]
-    emit('update:title', title, subtitle)
-  }
-  const titles = container.value?.querySelectorAll('[data-title-opacity="true"]')
-  Array.from(titles as unknown as HTMLElement[]).forEach((el) => {
+  getIntersectingElements('group-title')
+    .map((el) => [el.dataset.groupTitle, el.dataset.groupSubtitle])
+    .slice(0, 1)
+    .forEach(([title, subtitle]) => {
+      emit('update:title', title, subtitle)
+    })
+  getIntersectingElements('divider-title').forEach((el) => {
     const { top } = el.getBoundingClientRect()
-    console.log(top)
-    el.style.opacity = (((top - (toolbar.value?.clientHeight ?? 0)) * 1.5) / 100).toFixed(2)
+    el.style.opacity = (((top - toolbarHeight.value) * 1.5) / 100).toFixed(2)
   })
 }
 
-function zoomIn(scale: Scale, entity: Block | Week | Workout | Video) {
+function updateAnchor() {
+  console.log(intersections.value)
+  anchors.value = JSON.parse(
+    getIntersectingElements('anchors')[0]?.dataset.anchors!
+  ) as PVideoListTransitionProps['anchors']
+}
+
+function zoomIn(group: VideoGroup, scale: Scale, id: string) {
+  anchors.value = group.anchors
   emit('update:scale', scale)
-  const observer = new MutationObserver(() => {
-    const el = container.value!.querySelector(`[id="${entity.id}"]`)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-      observer.disconnect()
-    }
-  })
-  observer.observe(container.value!, {
-    subtree: true,
-    childList: true
-  })
-}
-
-function scrollToTop() {
-  scrollY.value = 0
 }
 
 function setMainScrollPaddingTop() {
-  const main = useRefStore().get('main')
-  const toolbar = useRefStore().get('toolbar')
-  if (main.value && toolbar.value) {
-    main.value.style.scrollPaddingTop = `${toolbar.value.clientHeight}px`
+  if (main.value && toolbarHeight.value) {
+    main.value.style.scrollPaddingTop = `${toolbarHeight.value}px`
   }
+}
+
+function onTransitionComplete(scrollTop: number) {
+  scrollY.value = scrollTop
 }
 
 onMounted(setMainScrollPaddingTop)
 watch(() => scrollY.value, updateTitle)
-watch(() => scale.value, scrollToTop)
+watch(() => scrollY.value, updateAnchor)
 </script>
 
 <template>
-  <div v-if="main && toolbar" class="container-fluid PVideoList" ref="container">
-    <div v-if="scale === Scale.All" key="all" class="row">
-      <PVideoListItem
-        v-for="{ id, ...video } in props.videos"
-        class="col col-4 col-md-2"
-        :id="id"
-        :key="id"
-        :video="{ id, ...video }"
-        :visible="imageVisibilities[id] ?? false"
-        :data-visibility-id="id"
-        :data-title="videoDate({ id, ...video })"
-        v-intersect.delay.visible.once="{ on: () => (imageVisibilities[id] = true) }"
-        v-intersect="{
-          on: (visible: boolean) => (titleVisibilities[id] = visible),
-          options: { root: main, rootMargin: titleIntersectionRootMargin }
-        }"
-      />
-    </div>
-    <template v-if="groups">
-      <div v-if="scale === Scale.Block" key="block" class="row">
-        <div class="col col-12" v-for="(group, i) in groups" :key="group.block.id">
-          <PVideoListDivider v-if="i > 0"></PVideoListDivider>
-          <PVideoListGroup
-            :id="group.block.id"
-            :videos="group.videos"
-            :title="group.title"
-            :subtitle="group.subtitle"
-            @click="zoomIn(Scale.Week, group.week)"
-          ></PVideoListGroup>
-        </div>
+  <div v-if="main && toolbar" class="PVideoList container-fluid" ref="container">
+    <PVideoListTransition
+      :scale="scale"
+      :anchors="anchors"
+      :offset-top="toolbarHeight"
+      @complete="onTransitionComplete"
+    >
+      <div v-if="scale === Scale.All" key="all" class="row">
+        <PVideoListItem
+          v-for="{ id, ...video } in props.videos"
+          class="col col-4 col-md-2"
+          :id="id"
+          :key="id"
+          :video="{ id, ...video }"
+          :data-intersection-id="`video_${id}`"
+          :data-group-title="videoDate({ id, ...video })"
+          :data-anchors="
+            JSON.stringify({
+              block: video.block.id,
+              week: video.week.id,
+              workout: video.workout.id,
+              all: id
+            })
+          "
+          v-intersect="{
+            on: (is: boolean) => (intersections[`video_${id}`] = is),
+            options: { root: main, rootMargin: titleIntersectionRootMargin }
+          }"
+        />
       </div>
-      <div v-else-if="scale === Scale.Week" key="week" class="row">
-        <div class="col col-12" v-for="({ week, ...group }, i) in groups" :key="week.id">
-          <PVideoListDivider
-            v-if="i > 0"
-            :data-title-opacity="group.block.id !== groups[i - 1].block.id"
-            :title="group.block.id !== groups[i - 1].block.id ? blockName(group.block) : undefined"
-          ></PVideoListDivider>
-          <PVideoListGroup
-            :id="week.id"
-            :videos="group.videos"
-            :title="group.title"
-            :subtitle="group.subtitle"
-            :preview="6"
-            :data-visibility-id="week.id"
-            :data-title="blockName(group.block)"
-            v-intersect="{
-              on: (visible: boolean) => (titleVisibilities[week.id] = visible),
-              options: { rootMargin: titleIntersectionRootMargin }
-            }"
-            @click="zoomIn(Scale.Workout, group.workout)"
-          ></PVideoListGroup>
+      <template v-if="groups">
+        <div v-if="scale === Scale.Block" key="block" class="row">
+          <div class="col col-12" v-for="(group, i) in groups" :key="group.block.id">
+            <PVideoListDivider v-if="i > 0"></PVideoListDivider>
+            <PVideoListGroup
+              :id="group.block.id"
+              :videos="group.videos"
+              :title="group.title"
+              :subtitle="group.subtitle"
+              :preview="6"
+              :data-intersection-id="`block_${group.block.id}`"
+              :data-anchors="JSON.stringify(group.anchors)"
+              @click:video="({ id }) => zoomIn(group, Scale.Week, id)"
+              v-intersect="{
+                on: (is: boolean) => (intersections[`block_${group.block.id}`] = is),
+                options: { rootMargin: titleIntersectionRootMargin }
+              }"
+            ></PVideoListGroup>
+          </div>
         </div>
-      </div>
-      <div v-else-if="scale === Scale.Workout" key="workout" class="row">
-        <div class="col col-12" v-for="({ workout, ...group }, i) in groups" :key="workout.id">
-          <PVideoListDivider
-            v-if="i > 0"
-            :data-title-opacity="group.week.id !== groups[i - 1].week.id"
-            :title="group.week.id !== groups[i - 1].week.id ? blockName(group.block) : undefined"
-            :subtitle="group.week.id !== groups[i - 1].week.id ? weekName(group.week) : undefined"
-          ></PVideoListDivider>
-          <PVideoListGroup
-            :id="workout.id"
-            :videos="group.videos"
-            :title="group.title"
-            :subtitle="group.subtitle"
-            :preview="3"
-            :data-visibility-id="workout.id"
-            :data-title="blockName(group.block)"
-            :data-subtitle="weekName(group.week)"
-            v-intersect="{
-              on: (visible: boolean) => (titleVisibilities[workout.id] = visible),
-              options: { rootMargin: titleIntersectionRootMargin }
-            }"
-            @click="zoomIn(Scale.All, group.videos[0])"
-          ></PVideoListGroup>
+        <div v-else-if="scale === Scale.Week" key="week" class="row">
+          <div class="col col-12" v-for="({ block, week, ...group }, i) in groups" :key="week.id">
+            <PVideoListDivider
+              v-if="i > 0"
+              v-bind="
+                block.id !== groups[i - 1].block.id && {
+                  title: blockName(block),
+                  'data-intersection-id': `block_divider_${block.id}`,
+                  'data-divider-title': true
+                }
+              "
+              v-intersect="
+                block.id !== groups[i - 1].block.id && {
+                  on: (is: boolean) => (intersections[`block_divider_${block.id}`] = is),
+                  options: { rootMargin: titleIntersectionRootMargin }
+                }
+              "
+            ></PVideoListDivider>
+            <PVideoListGroup
+              :id="week.id"
+              :videos="group.videos"
+              :title="group.title"
+              :subtitle="group.subtitle"
+              :preview="6"
+              :data-intersection-id="`week_${week.id}`"
+              :data-group-title="blockName(block)"
+              :data-anchors="JSON.stringify(group.anchors)"
+              v-intersect="{
+                on: (visible: boolean) => (intersections[`week_${week.id}`] = visible),
+                options: { rootMargin: titleIntersectionRootMargin }
+              }"
+              @click:video="({ id }) => zoomIn({ block, week, ...group }, Scale.Workout, id)"
+            ></PVideoListGroup>
+          </div>
         </div>
-      </div>
-    </template>
+        <div v-else-if="scale === Scale.Workout" key="workout" class="row">
+          <div
+            class="col col-12"
+            v-for="({ block, week, workout, ...group }, i) in groups"
+            :key="workout.id"
+          >
+            <PVideoListDivider
+              v-if="i > 0"
+              v-bind="
+                week.id !== groups[i - 1].week.id && {
+                  title: blockName(block),
+                  subtitle: weekName(week),
+                  'data-intersection-id': `week_divider_${week.id}`,
+                  'data-divider-title': true
+                }
+              "
+              v-intersect="
+                week.id !== groups[i - 1].week.id && {
+                  on: (is: boolean) => (intersections[`week_divider_${week.id}`] = is),
+                  options: { rootMargin: titleIntersectionRootMargin }
+                }
+              "
+            ></PVideoListDivider>
+            <PVideoListGroup
+              :id="workout.id"
+              :videos="group.videos"
+              :title="group.title"
+              :subtitle="group.subtitle"
+              :preview="3"
+              :data-intersection-id="`workout_${workout.id}`"
+              :data-group-title="blockName(block)"
+              :data-group-subtitle="weekName(week)"
+              :data-anchors="JSON.stringify(group.anchors)"
+              v-intersect="{
+                on: (is: boolean) => (intersections[`workout_${workout.id}`] = is),
+                options: { rootMargin: titleIntersectionRootMargin }
+              }"
+              @click:video="({ id }) => zoomIn({ block, week, workout, ...group }, Scale.All, id)"
+            ></PVideoListGroup>
+          </div>
+        </div>
+      </template>
+    </PVideoListTransition>
   </div>
   <RouterView />
 </template>

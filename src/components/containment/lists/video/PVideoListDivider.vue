@@ -16,9 +16,9 @@ const props = defineProps<PVideoListDividerProps>()
     style="--bs-dark-rgb: 13, 17, 21"
   >
     <span class="d-inline-flex align-items-center opacity-75">
-      {{ title }}
-      <PIcon v-if="subtitle" class="opacity-25" :size="24" :path="'mdiChevronRight'"></PIcon>
-      <span v-if="subtitle">{{ subtitle }}</span>
+      {{ props.title }}
+      <PIcon v-if="props.subtitle" class="opacity-25" :size="24" :path="'mdiChevronRight'"></PIcon>
+      <span v-if="props.subtitle">{{ props.subtitle }}</span>
     </span>
   </div>
 </template>

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { type Video } from '@/types'
 import PVideoListItem from '@/components/containment/lists/video/PVideoListItem.vue'
-import vIntersect from '@/directives/PIntersect'
 
 export type PVideoListItemProps = {
   preview?: number
@@ -13,7 +12,9 @@ export type PVideoListItemProps = {
 
 const props = withDefaults(defineProps<PVideoListItemProps>(), { preview: 9 })
 
-const visibilities = ref<Record<string, boolean>>({})
+const emit = defineEmits<{
+  'click:video': [Video]
+}>()
 
 const previewedVideos = computed<Video[]>(() => props.videos.slice(0, props.preview))
 const more = computed<number>(() => props.videos.length - props.preview)
@@ -23,12 +24,12 @@ const more = computed<number>(() => props.videos.length - props.preview)
   <div class="container-fluid position-relative">
     <div class="row">
       <PVideoListItem
-        v-for="(video, index) in previewedVideos"
+        v-for="({ id, ...video }, index) in previewedVideos"
         class="col-4 col-md-2 gx-0"
-        :key="video.id"
-        :video="video"
-        :visible="visibilities[video.id] ?? false"
-        v-intersect.delay.visible.once="{ on: () => (visibilities[video.id] = true) }"
+        :id="id"
+        :key="id"
+        :video="{ id, ...video }"
+        @click="(video) => emit('click:video', video)"
       >
         <template #overlay>
           <div
@@ -42,9 +43,9 @@ const more = computed<number>(() => props.videos.length - props.preview)
         </template>
       </PVideoListItem>
       <div
-        class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 h-100 bg-dark bg-gradient text-bg-dark"
+        class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 bg-dark bg-gradient text-bg-dark"
         style="
-          --bs-gradient: linear-gradient(0, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.6));
+          --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
           --bs-bg-opacity: 0;
         "
       >
@@ -64,5 +65,7 @@ const more = computed<number>(() => props.videos.length - props.preview)
 }
 .PVideoListGroupTitle {
   padding-left: 1rem !important;
+  pointer-events: none;
+  height: 8rem;
 }
 </style>
