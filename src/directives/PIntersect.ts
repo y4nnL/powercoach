@@ -1,7 +1,13 @@
 import { camelize } from 'vue'
-import type { Directive, DirectiveBinding } from 'vue'
+import type { ObjectDirective, DirectiveBinding } from 'vue'
 
-export type PIntersectProps = { on: (visible?: boolean) => any; options?: IntersectionObserverInit }
+declare module 'vue' {
+  interface HTMLAttributes {
+    vIntersect?: PIntersectProps
+  }
+}
+
+export type PIntersectProps = { on: (visible: boolean) => any; options?: IntersectionObserverInit }
 
 const IMMEDIATELY_VISIBLE_TIME = 200
 const TIME_IN_VIEWPORT = 500
@@ -66,7 +72,7 @@ function unmounted(element: HTMLElement, binding: DirectiveBinding) {
   }
 }
 
-const PIntersect: Directive<HTMLElement, PIntersectProps> = {
+const PIntersect: ObjectDirective<HTMLElement, PIntersectProps> = {
   mounted,
   unmounted
 }

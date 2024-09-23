@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import 'bootstrap'
 import { ref, computed } from 'vue'
 import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import { useRefStore } from '@/stores/ref'
@@ -19,7 +20,7 @@ useRefStore().set('main', main)
 </script>
 
 <template>
-  <div class="vh-100 d-flex flex-column bg-dark" style="--bs-dark-rgb: 13, 17, 21">
+  <div class="vh-100 d-flex flex-column">
     <div ref="main" class="h-100 overflow-scroll">
       <RouterView />
     </div>
@@ -37,3 +38,21 @@ useRefStore().set('main', main)
     style="z-index: 1000000"
   ></PIcon>
 </template>
+
+<style lang="scss">
+$blue: #dbc078;
+$dark: #1c1c1c;
+
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+}
+
+body {
+  --bs-body-bg: rgb(var(--bs-dark-rgb));
+}
+
+@import 'bootstrap/scss/bootstrap.scss';
+</style>

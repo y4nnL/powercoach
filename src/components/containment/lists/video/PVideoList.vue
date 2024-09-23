@@ -38,7 +38,7 @@ const props = defineProps<PVideoListProps>()
 
 const emit = defineEmits<{
   'update:scale': [scale: Scale]
-  'update:title': [title: string | undefined, subtitle: string | undefined]
+  'update:title': [{ title?: string; subtitle?: string }]
 }>()
 
 const intersections = ref<Record<string, boolean>>({})
@@ -65,7 +65,7 @@ const { y: scrollY } = useMainScroll(50)
 
 const groups = computed<VideoGroup[] | null>(() => {
   if (scale.value === Scale.Block) {
-    emit('update:title')
+    emit('update:title', {})
     return createVideoGroups({
       key: (video) => video.block.id,
       subtitle: ({ videos }) => blockScaleDate(videos),
@@ -80,7 +80,7 @@ const groups = computed<VideoGroup[] | null>(() => {
       title: ({ week }) => weekName(week)
     })
     const [{ block }] = videoGroups
-    emit('update:title', blockName(block))
+    emit('update:title', { title: blockName(block) })
     return videoGroups
   }
 
@@ -91,11 +91,11 @@ const groups = computed<VideoGroup[] | null>(() => {
       title: ({ workout }) => workoutName(workout)
     })
     const [{ week, block }] = videoGroups
-    emit('update:title', blockName(block), weekName(week))
+    emit('update:title', { title: blockName(block), subtitle: weekName(week) })
     return videoGroups
   }
 
-  emit('update:title', videoDate(props.videos[0]))
+  emit('update:title', { title: videoDate(props.videos[0]) })
   return null
 })
 
@@ -137,7 +137,7 @@ function updateTitle() {
     .map((el) => [el.dataset.groupTitle, el.dataset.groupSubtitle])
     .slice(0, 1)
     .forEach(([title, subtitle]) => {
-      emit('update:title', title, subtitle)
+      emit('update:title', { title, subtitle })
     })
   getIntersectingElements('divider-title').forEach((el) => {
     const { top } = el.getBoundingClientRect()
@@ -146,7 +146,6 @@ function updateTitle() {
 }
 
 function updateAnchor() {
-  console.log(intersections.value)
   anchors.value = JSON.parse(
     getIntersectingElements('anchors')[0]?.dataset.anchors!
   ) as PVideoListTransitionProps['anchors']
@@ -226,21 +225,16 @@ watch(() => scrollY.value, updateAnchor)
         <div v-else-if="scale === Scale.Week" key="week" class="row">
           <div class="col col-12" v-for="({ block, week, ...group }, i) in groups" :key="week.id">
             <PVideoListDivider
-              v-if="i > 0"
-              v-bind="
-                block.id !== groups[i - 1].block.id && {
-                  title: blockName(block),
-                  'data-intersection-id': `block_divider_${block.id}`,
-                  'data-divider-title': true
-                }
-              "
-              v-intersect="
-                block.id !== groups[i - 1].block.id && {
-                  on: (is: boolean) => (intersections[`block_divider_${block.id}`] = is),
-                  options: { rootMargin: titleIntersectionRootMargin }
-                }
-              "
+              v-if="i > 0 && block.id !== groups[i - 1].block.id"
+              :title="blockName(block)"
+              :data-intersection-id="`block_divider_${block.id}`"
+              :data-divider-title="true"
+              v-intersect="{
+                on: (is: boolean) => (intersections[`block_divider_${block.id}`] = is),
+                options: { rootMargin: titleIntersectionRootMargin }
+              }"
             ></PVideoListDivider>
+            <PVideoListDivider v-else-if="i > 0"></PVideoListDivider>
             <PVideoListGroup
               :id="week.id"
               :videos="group.videos"
@@ -265,22 +259,17 @@ watch(() => scrollY.value, updateAnchor)
             :key="workout.id"
           >
             <PVideoListDivider
-              v-if="i > 0"
-              v-bind="
-                week.id !== groups[i - 1].week.id && {
-                  title: blockName(block),
-                  subtitle: weekName(week),
-                  'data-intersection-id': `week_divider_${week.id}`,
-                  'data-divider-title': true
-                }
-              "
-              v-intersect="
-                week.id !== groups[i - 1].week.id && {
-                  on: (is: boolean) => (intersections[`week_divider_${week.id}`] = is),
-                  options: { rootMargin: titleIntersectionRootMargin }
-                }
-              "
+              v-if="i > 0 && week.id !== groups[i - 1].week.id"
+              :title="blockName(block)"
+              :subtitle="weekName(week)"
+              :data-intersection-id="`week_divider_${week.id}`"
+              :data-divider-title="true"
+              v-intersect="{
+                on: (is: boolean) => (intersections[`week_divider_${week.id}`] = is),
+                options: { rootMargin: titleIntersectionRootMargin }
+              }"
             ></PVideoListDivider>
+            <PVideoListDivider v-else-if="i > 0"></PVideoListDivider>
             <PVideoListGroup
               :id="workout.id"
               :videos="group.videos"

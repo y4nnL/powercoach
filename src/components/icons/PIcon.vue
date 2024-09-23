@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { withDefaults } from 'vue'
 import VueIcon, { type MDI } from '@jamescoyle/vue-icon'
 import * as mdijs from '@mdi/js'
 

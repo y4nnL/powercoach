@@ -30,13 +30,12 @@ useRefStore().set('toolbar', container)
 </script>
 
 <template>
-  <nav
-    class="navbar navbar-dark bg-dark overflow-hidden"
-    ref="container"
-    style="--bs-dark-rgb: 13, 17, 21"
-  >
+  <nav class="PVideoListToolbar navbar navbar-dark bg-dark bg-transparent" ref="container">
+    <div
+      class="PVideoListToolbar-bg position-absolute top-0 start-0 w-100 h-100 bg-gradient z-1"
+    ></div>
     <div class="container-fluid">
-      <a class="navbar-brand position-relative">
+      <a class="navbar-brand position-relative z-2">
         &nbsp;
         <PSlideTransitionGroup
           :direction="scrollingUp ? 'up' : scrollingDown ? 'down' : undefined"
@@ -56,3 +55,19 @@ useRefStore().set('toolbar', container)
     </div>
   </nav>
 </template>
+
+<style scoped lang="scss">
+.PVideoListToolbar {
+  padding-top: var(--safe-area-top);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+
+  .PVideoListToolbar-bg {
+    pointer-events: none;
+    --bs-gradient: linear-gradient(
+      180deg,
+      rgba(var(--bs-dark-rgb), 0.8),
+      rgba(var(--bs-dark-rgb), 0)
+    );
+  }
+}
+</style>

@@ -9,7 +9,7 @@ export type PVideoListTransitionProps = {
   scale: Scale
 }
 
-const DURATION = 300
+const DURATION = 250
 const DELAY = DURATION / 2
 const SCALE = 0.2
 
@@ -33,7 +33,7 @@ const scaleLevel = {
 const enter = ref<{ el: HTMLElement; done: () => void }>()
 const leave = ref<{ el: HTMLElement; done: () => void }>()
 
-function startIn() {
+function transition() {
   const leaveDOMRect = leave.value!.el.getBoundingClientRect()
   const leaveTransformOrigin = `50% ${window.innerHeight / 2 - leaveDOMRect.top}px`
 
@@ -46,7 +46,8 @@ function startIn() {
     : null
 
   if (anchor) {
-    anchorOffset = anchor.getBoundingClientRect().top - enter.value!.el.getBoundingClientRect().top
+    anchorOffset =
+      anchor.getBoundingClientRect().top - enter.value!.el.getBoundingClientRect().top + 1
     enterTop -= anchorOffset
     enterTransformOrigin = `50% ${window.innerHeight / 2 + anchorOffset}px`
   }
@@ -64,7 +65,7 @@ function startIn() {
     // enter scale animation
     anime({
       targets: enter.value!.el,
-      scale: [1 - SCALE, 1],
+      scale: [1 + SCALE * (direction.value === 'in' ? -1 : 1), 1],
       top: [enterTop, enterTop],
       transformOrigin: [enterTransformOrigin, enterTransformOrigin],
       duration: DURATION,
@@ -83,73 +84,7 @@ function startIn() {
     // leave scale animation
     anime({
       targets: leave.value!.el,
-      scale: 1 + SCALE,
-      transformOrigin: [leaveTransformOrigin, leaveTransformOrigin],
-      duration: DURATION,
-      easing: 'easeInQuad'
-    }).finished
-  ]).finally(() => {
-    emit('complete', anchorOffset)
-    leave.value!.el.removeAttribute('style')
-    enter.value!.el.removeAttribute('style')
-    enter.value!.done()
-    leave.value!.done()
-    enter.value = undefined
-    leave.value = undefined
-  })
-}
-
-function startOut() {
-  const leaveDOMRect = leave.value!.el.getBoundingClientRect()
-  const leaveTransformOrigin = `50% ${window.innerHeight / 2 - leaveDOMRect.top}px`
-
-  let enterTop = -(leaveDOMRect.height + leaveDOMRect.top - props.offsetTop)
-  let enterTransformOrigin = `50% ${window.innerHeight / 2}px`
-
-  let anchorOffset = 0
-  const anchor = props.anchors?.[props.scale]
-    ? (enter.value!.el.querySelector(`[id="${props.anchors[props.scale]}"]`) as HTMLElement)
-    : null
-
-  if (anchor) {
-    anchorOffset = anchor.getBoundingClientRect().top - enter.value!.el.getBoundingClientRect().top
-    enterTop -= anchorOffset
-    enterTransformOrigin = `50% ${window.innerHeight / 2 + anchorOffset}px`
-  }
-
-  Promise.all([
-    // enter opacity animation
-    anime({
-      targets: enter.value!.el,
-      opacity: [0, 1],
-      duration: DURATION,
-      easing: 'linear',
-      delay: DELAY
-    }).finished,
-
-    // enter scale animation
-    anime({
-      targets: enter.value!.el,
-      scale: [1.3, 1],
-      top: [enterTop, enterTop],
-      transformOrigin: [enterTransformOrigin, enterTransformOrigin],
-      duration: DURATION,
-      easing: 'easeOutQuad',
-      delay: DELAY
-    }).finished,
-
-    // leave opacity animation
-    anime({
-      targets: leave.value!.el,
-      opacity: 0,
-      duration: DURATION,
-      easing: 'linear'
-    }).finished,
-
-    // leave scale animation
-    anime({
-      targets: leave.value!.el,
-      scale: 0.7,
+      scale: 1 + SCALE * (direction.value === 'in' ? 1 : -1),
       transformOrigin: [leaveTransformOrigin, leaveTransformOrigin],
       duration: DURATION,
       easing: 'easeInQuad'
@@ -167,28 +102,9 @@ function startOut() {
 
 watchEffect(() => {
   if (enter.value && leave.value) {
-    direction.value === 'in' && startIn()
-    direction.value === 'out' && startOut()
+    transition()
   }
 })
-
-// function enter(el: HTMLElement) {
-//   if (direction.value === 'out') {
-//     const anchorDOMRect = el.querySelector(`[id="${props.anchors?.out}"]`)?.getBoundingClientRect()
-//     const anchorDOMRectTop = anchorDOMRect ? anchorDOMRect.top - leavingDOMRect.height : 0
-//     console.log(anchorDOMRectTop)
-//     el.style.top = `-${leavingDOMRect.height + leavingDOMRect.top + anchorDOMRectTop - props.offsetTop}px`
-//     el.style.transformOrigin = `50% ${window.innerHeight / 2}px`
-//   }
-// }
-
-// function leave(el: HTMLElement) {
-//   console.log(props.anchors)
-//   if (direction.value === 'out') {
-//     leavingDOMRect = el.getBoundingClientRect()
-//     el.style.transformOrigin = `50% ${window.innerHeight / 2 - leavingDOMRect.top}px`
-//   }
-// }
 
 watch(
   () => props.scale,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, type ComponentInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PVideoList from '@/components/containment/lists/video/PVideoList.vue'
 import PVideoListToolbar from '@/components/containment/toolbars/PVideoListToolbar.vue'
@@ -14,25 +14,18 @@ const videosQuery = useVideosQuery()
 
 const scale = ref<Scale>(Scale.Block)
 
-const title = ref<string | undefined>()
+const titles = ref<{ title?: string; subtitle?: string }>({})
 
-const subtitle = ref<string | undefined>()
+const onUpdateTitle: ComponentInstance<typeof PVideoList>['onUpdate:title'] = (updatedTitles) => {
+  titles.value = updatedTitles
+}
 </script>
 
 <template>
   <PLoader :query="videosQuery">
     <template #default="{ data: videos }">
-      <PVideoListToolbar class="sticky-top" :title="title" :subtitle="subtitle" />
-      <PVideoList
-        v-model:scale="scale"
-        :videos="videos"
-        @update:title="
-          (newTitle, newSubtitle) => {
-            title = newTitle
-            subtitle = newSubtitle
-          }
-        "
-      />
+      <PVideoListToolbar class="sticky-top" v-bind="titles" />
+      <PVideoList v-model:scale="scale" :videos="videos" @update:title="onUpdateTitle" />
       <Teleport to="#fixed-bottom">
         <PScaleButtonGroup
           class="w-100 mb-2"

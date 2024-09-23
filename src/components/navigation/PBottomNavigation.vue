@@ -9,7 +9,7 @@ defineExpose({ container })
 </script>
 
 <template>
-  <nav class="navbar navbar-expand navbar-dark bg-dark" ref="container">
+  <nav class="PBottomNavigation navbar navbar-expand navbar-dark bg-dark" ref="container">
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav w-100 justify-content-center">
         <li class="nav-item">
@@ -21,3 +21,9 @@ defineExpose({ container })
     </div>
   </nav>
 </template>
+
+<style scoped>
+.PBottomNavigation {
+  padding-bottom: var(--safe-area-bottom);
+}
+</style>

@@ -54,7 +54,6 @@ if (!cached.value) {
       <div v-else class="ratio ratio-1x1 bg-dark" key="placeholder">
         <div
           class="d-flex justify-content-center align-items-center bg-dark"
-          style="--bs-dark-rgb: 53, 57, 61"
           v-intersect.delay.visible.once="{ on: (is: boolean) => (visible = is) }"
         >
           <PIcon

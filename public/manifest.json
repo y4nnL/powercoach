@@ -1,0 +1,17 @@
+{
+  "background_color": "#1c1c1c",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "sizes": "1024x1024",
+      "src": "/logo.jpeg",
+      "type": "image/jpeg"
+    }
+  ],
+  "name": "PowerCoach",
+  "orientation": "portrait",
+  "serviceworker": "/",
+  "short_name": "PowerCoach",
+  "start_url": "/index.html",
+  "theme_color": "#1c1c1c"
+}

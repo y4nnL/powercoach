@@ -1,6 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
