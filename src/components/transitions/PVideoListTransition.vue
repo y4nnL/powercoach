@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { nextTick } from 'vue'
+import { nextTick, ref, watch, watchEffect } from 'vue'
 import anime from 'animejs'
 import { Scale } from '@/types'
-import { ref, watch, watchEffect } from 'vue'
+import { useRefStore } from '@/stores/ref'
 
 export type PVideoListTransitionProps = {
   anchors?: { [scale in Scale]?: string }
@@ -36,12 +36,17 @@ const appear = ref<boolean>(true)
 const enter = ref<{ el: HTMLElement; done: () => void }>()
 const leave = ref<{ el: HTMLElement; done: () => void }>()
 
+const main = useRefStore().get('main')
+
 function transition() {
+  const { innerHeight: viewportHeight } = window
+  const mainHeight = main.value!.getBoundingClientRect().height
+
   const leaveDOMRect = leave.value!.el.getBoundingClientRect()
-  const leaveTransformOrigin = `50% ${window.innerHeight / 2 - leaveDOMRect.top}px`
+  const leaveTransformOrigin = `50% ${viewportHeight / 2 - leaveDOMRect.top}px`
 
   let enterTop = -(leaveDOMRect.height + leaveDOMRect.top - props.offsetTop)
-  let enterTransformOrigin = `50% ${window.innerHeight / 2}px`
+  let enterTransformOrigin = `50% ${viewportHeight / 2}px`
 
   let anchorOffset = 0
   const anchor = props.anchors?.[props.scale]
@@ -51,9 +56,12 @@ function transition() {
   if (anchor) {
     const enterDOMRect = enter.value!.el.getBoundingClientRect()
     anchorOffset = anchor.getBoundingClientRect().top - enterDOMRect.top + 1
-    //if (anchorOffset > enterDOMRect)
+    const enterOffsetHeight = enterDOMRect.height + props.offsetTop - anchorOffset
+    if (enterOffsetHeight < mainHeight) {
+      anchorOffset -= mainHeight - enterOffsetHeight
+    }
     enterTop -= anchorOffset
-    enterTransformOrigin = `50% ${window.innerHeight / 2 + anchorOffset}px`
+    enterTransformOrigin = `50% ${viewportHeight / 2 + anchorOffset}px`
   }
 
   Promise.all([
@@ -135,6 +143,9 @@ function transitionAppear() {
 }
 
 watchEffect(() => {
+  if (!main.value) {
+    return
+  }
   if (enter.value && leave.value) {
     transition()
   } else if (enter.value && appear.value) {
