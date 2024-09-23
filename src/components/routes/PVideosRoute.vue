@@ -12,7 +12,7 @@ const { t } = useI18n()
 
 const videosQuery = useVideosQuery()
 
-const scale = ref<Scale>(Scale.Block)
+const scale = ref<Scale>(Scale.All)
 
 const titles = ref<{ title?: string; subtitle?: string }>({})
 

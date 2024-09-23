@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { nextTick } from 'vue'
 import anime from 'animejs'
 import { Scale } from '@/types'
 import { ref, watch, watchEffect } from 'vue'
@@ -30,6 +31,8 @@ const scaleLevel = {
   [Scale.Block]: 6
 }
 
+const appear = ref<boolean>(true)
+
 const enter = ref<{ el: HTMLElement; done: () => void }>()
 const leave = ref<{ el: HTMLElement; done: () => void }>()
 
@@ -46,8 +49,9 @@ function transition() {
     : null
 
   if (anchor) {
-    anchorOffset =
-      anchor.getBoundingClientRect().top - enter.value!.el.getBoundingClientRect().top + 1
+    const enterDOMRect = enter.value!.el.getBoundingClientRect()
+    anchorOffset = anchor.getBoundingClientRect().top - enterDOMRect.top + 1
+    //if (anchorOffset > enterDOMRect)
     enterTop -= anchorOffset
     enterTransformOrigin = `50% ${window.innerHeight / 2 + anchorOffset}px`
   }
@@ -90,19 +94,52 @@ function transition() {
       easing: 'easeInQuad'
     }).finished
   ]).finally(() => {
-    emit('complete', anchorOffset)
     leave.value!.el.removeAttribute('style')
     enter.value!.el.removeAttribute('style')
     enter.value!.done()
     leave.value!.done()
     enter.value = undefined
     leave.value = undefined
+    nextTick(() => emit('complete', anchorOffset))
+  })
+}
+
+function transitionAppear() {
+  let transformOrigin = `50% ${window.innerHeight / 2}px`
+
+  Promise.all([
+    // enter opacity animation
+    anime({
+      targets: enter.value!.el,
+      opacity: [0, 1],
+      duration: DURATION * 2,
+      easing: 'linear',
+      delay: DELAY
+    }).finished,
+
+    // enter scale animation
+    anime({
+      targets: enter.value!.el,
+      scale: [1 + SCALE * (direction.value === 'in' ? 1 : -1), 1],
+      transformOrigin: [transformOrigin, transformOrigin],
+      duration: DURATION * 2,
+      easing: 'easeOutQuad',
+      delay: DELAY
+    }).finished
+  ]).finally(() => {
+    enter.value!.el.removeAttribute('style')
+    enter.value!.done()
+    enter.value = undefined
+    nextTick(() => emit('complete', 0))
   })
 }
 
 watchEffect(() => {
   if (enter.value && leave.value) {
     transition()
+  } else if (enter.value && appear.value) {
+    transitionAppear()
+    appear.value = false
   }
 })
 
@@ -119,6 +156,7 @@ watch(
     :name="`scale-${direction}`"
     @enter="(el, done) => (enter = { el: el as HTMLElement, done })"
     @leave="(el, done) => (leave = { el: el as HTMLElement, done })"
+    :appear="true"
   >
     <slot></slot>
   </transition>
