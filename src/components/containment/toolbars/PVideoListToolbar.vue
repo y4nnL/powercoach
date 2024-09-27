@@ -1,73 +1,144 @@
 <script setup lang="ts">
-import { ref, toRefs, watch } from 'vue'
-import { throttle } from 'lodash'
-import PSlideTransitionGroup from '@/components/transitions/PSlideTransitionGroup.vue'
-import { useMainScroll } from '@/composables/useMainScroll'
+import { computed, ref } from 'vue'
 import { useRefStore } from '@/stores/ref'
 import PIcon from '@/components/icons/PIcon.vue'
+import { Scale, type Video } from '@/types'
+import { useHumanReadability } from '@/composables/useHumanReadability'
+import PRollTransition from '@/components/transitions/PRollTransition.vue'
 
 export type PVideoListToolbarProps = {
-  title?: string
-  subtitle?: string
+  scale: Scale
+  throttle?: number
+  video?: Video
 }
 
-const TRANSITION_THROTTLE = 500
+const props = withDefaults(defineProps<PVideoListToolbarProps>(), { throttle: 500 })
 
-const props = defineProps<PVideoListToolbarProps>()
-
-const { top: scrollingUp, bottom: scrollingDown } = toRefs(useMainScroll().directions)
-
-const titles = ref<(string | undefined)[]>([props.title])
+const { blockName, weekName, workoutName, videoDate } = useHumanReadability()
 
 const container = ref<HTMLElement | null>(null)
 
-watch(
-  () => props.title,
-  throttle((newTitle) => (titles.value = [newTitle]), TRANSITION_THROTTLE)
+const block = computed<string | undefined>(() =>
+  props.video && props.scale !== Scale.Block ? blockName(props.video.block) : undefined
 )
+const week = computed<string | undefined>(() =>
+  props.video && [Scale.Workout, Scale.All].includes(props.scale)
+    ? weekName(props.video.week)
+    : undefined
+)
+const workout = computed<string | undefined>(() =>
+  props.video && props.scale === Scale.All ? workoutName(props.video.workout) : undefined
+)
+const date = computed<string | undefined>(() =>
+  props.video && props.scale === Scale.All ? videoDate(props.video) : undefined
+)
+
+const isBlockShown = computed<boolean>(() => props.scale !== Scale.Block)
+const isWeekShown = computed<boolean>(() => isBlockShown.value && Boolean(week.value))
+const isWorkoutShown = computed<boolean>(() => isWeekShown.value && Boolean(workout.value))
+const isDateShown = computed<boolean>(() => isWorkoutShown.value && Boolean(date.value))
+const isShown = computed<boolean>(() => isBlockShown.value)
+
+const readableBlock = computed<string>((previousValue) => {
+  return block.value ?? previousValue ?? ''
+})
+
+const readableWeek = computed<string>((previousValue) => {
+  return week.value ?? previousValue ?? ''
+})
+
+const readableWorkout = computed<string>((previousValue) => {
+  return workout.value ?? previousValue ?? ''
+})
+
+const readableDate = computed<string>((previousValue) => {
+  return date.value ?? previousValue ?? ''
+})
 
 useRefStore().set('toolbar', container)
 </script>
 
 <template>
-  <nav class="PVideoListToolbar navbar navbar-dark bg-dark bg-transparent" ref="container">
-    <div
-      class="PVideoListToolbar-bg position-absolute top-0 start-0 w-100 h-100 bg-gradient z-1"
-    ></div>
-    <div class="container-fluid">
-      <a class="navbar-brand position-relative z-2">
-        &nbsp;
-        <PSlideTransitionGroup
-          :direction="scrollingUp ? 'up' : scrollingDown ? 'down' : undefined"
-          @end="titles = [props.title]"
-        >
-          <span
-            v-for="title in titles"
-            :key="title + (subtitle ?? '')"
-            class="position-absolute d-inline-flex align-items-center"
-          >
-            {{ title }}
-            <PIcon v-if="subtitle" class="opacity-25" :size="24" :path="'mdiChevronRight'"></PIcon>
-            <span v-if="subtitle">{{ subtitle }}</span>
-          </span>
-        </PSlideTransitionGroup>
+  <nav class="navbar navbar-dark bg-dark bg-transparent" ref="container">
+    <div class="PVideoListToolbar-bg position-absolute top-0 start-0 w-100 bg-gradient z-1"></div>
+    <div class="container-fluid position-relative z-2">
+      <a
+        class="navbar-brand visibility d-flex flex-wrap"
+        :class="{ upper: isDateShown, show: isShown }"
+      >
+        <div class="visibility" :class="{ show: isBlockShown }">
+          <PRollTransition>
+            <span class="position-absolute d-inline-flex align-items-center" :key="readableBlock">
+              <span>{{ readableBlock }}</span>
+              <PIcon
+                class="visibility"
+                :class="{ show: isWeekShown }"
+                :path="'mdiChevronRight'"
+              ></PIcon>
+            </span>
+          </PRollTransition>
+          <span class="opacity-0 pe-4">{{ readableBlock }}</span>
+        </div>
+        <div class="visibility" :class="{ show: isWeekShown }">
+          <PRollTransition>
+            <span class="position-absolute d-inline-flex align-items-center" :key="readableWeek">
+              <span>{{ readableWeek }}</span>
+              <PIcon
+                class="visibility"
+                :class="{ show: isWorkoutShown }"
+                :path="'mdiChevronRight'"
+              ></PIcon>
+            </span>
+          </PRollTransition>
+          <span class="opacity-0 pe-4">{{ readableWeek }}</span>
+        </div>
+        <div class="visibility" :class="{ show: isWorkoutShown }">
+          <PRollTransition>
+            <span class="position-absolute" :key="readableWorkout">{{ readableWorkout }}</span>
+          </PRollTransition>
+          <span class="opacity-0">{{ readableWorkout }}</span>
+        </div>
+        <span>&nbsp;</span>
+        <div class="visibility small w-100" :class="{ show: isDateShown }">
+          <span class="position-absolute date">{{ readableDate }}</span>
+        </div>
       </a>
     </div>
   </nav>
 </template>
 
 <style scoped lang="scss">
-.PVideoListToolbar {
-  padding-top: var(--safe-area-top);
+.navbar {
+  padding-top: calc(var(--safe-area-top) + 1rem);
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
-
-  .PVideoListToolbar-bg {
-    pointer-events: none;
-    --bs-gradient: linear-gradient(
-      180deg,
-      rgba(var(--bs-dark-rgb), 0.8),
-      rgba(var(--bs-dark-rgb), 0)
-    );
+}
+.date {
+  transform: translateY(-15%);
+}
+.visibility {
+  transition: opacity 0.3s linear;
+  opacity: 0;
+  &.show {
+    opacity: 1;
   }
+}
+.visibility.navbar-brand {
+  transition:
+    transform 0.3s ease-in-out,
+    opacity 0.3s linear;
+  &.upper {
+    transform: translateY(-60%);
+  }
+}
+.bg-gradient {
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+  mask-image: linear-gradient(180deg, black 50%, transparent);
+  height: calc(100% + 1rem);
+  --bs-gradient: linear-gradient(
+    to bottom,
+    rgba(var(--bs-dark-rgb), 1),
+    rgba(var(--bs-dark-rgb), 0)
+  );
 }
 </style>

@@ -3,6 +3,7 @@ import { nextTick, ref, watch, watchEffect } from 'vue'
 import anime from 'animejs'
 import { Scale } from '@/types'
 import { useRefStore } from '@/stores/ref'
+import { debounce } from 'lodash'
 
 export type PVideoListTransitionProps = {
   anchors?: { [scale in Scale]?: string }
@@ -17,7 +18,8 @@ const SCALE = 0.2
 const props = defineProps<PVideoListTransitionProps>()
 
 const emit = defineEmits<{
-  complete: [scrollTop: number]
+  complete: [scrollY: number]
+  progress: []
 }>()
 
 const direction = ref<'in' | 'out'>('out')
@@ -64,6 +66,10 @@ function transition() {
     enterTransformOrigin = `50% ${viewportHeight / 2 + anchorOffset}px`
   }
 
+  const update = debounce(() => {
+    emit('progress')
+  }, 10)
+
   Promise.all([
     // enter opacity animation
     anime({
@@ -71,7 +77,8 @@ function transition() {
       opacity: [0, 1],
       duration: DURATION,
       easing: 'linear',
-      delay: DELAY
+      delay: DELAY,
+      update
     }).finished,
 
     // enter scale animation
@@ -82,7 +89,8 @@ function transition() {
       transformOrigin: [enterTransformOrigin, enterTransformOrigin],
       duration: DURATION,
       easing: 'easeOutQuad',
-      delay: DELAY
+      delay: DELAY,
+      update
     }).finished,
 
     // leave opacity animation
@@ -90,7 +98,8 @@ function transition() {
       targets: leave.value!.el,
       opacity: 0,
       duration: DURATION,
-      easing: 'linear'
+      easing: 'linear',
+      update
     }).finished,
 
     // leave scale animation
@@ -99,7 +108,8 @@ function transition() {
       scale: 1 + SCALE * (direction.value === 'in' ? 1 : -1),
       transformOrigin: [leaveTransformOrigin, leaveTransformOrigin],
       duration: DURATION,
-      easing: 'easeInQuad'
+      easing: 'easeInQuad',
+      update
     }).finished
   ]).finally(() => {
     leave.value!.el.removeAttribute('style')

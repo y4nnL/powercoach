@@ -7,7 +7,7 @@ export type DebugStore = {
 
 export const useDebugStore = defineStore<'debug', DebugStore>('debug', () => {
   const debugStore: DebugStore = {
-    reticle: ref<boolean>(true)
+    reticle: ref<boolean>(false)
   }
 
   return { ...debugStore }
