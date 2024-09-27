@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRefStore } from '@/stores/ref'
 import PIcon from '@/components/icons/PIcon.vue'
 import { Scale, type Video } from '@/types'
@@ -15,6 +15,11 @@ export type PVideoListToolbarProps = {
 const props = withDefaults(defineProps<PVideoListToolbarProps>(), { throttle: 500 })
 
 const { blockName, weekName, workoutName, videoDate } = useHumanReadability()
+
+const blockPlaceholder = ref<HTMLElement | null>(null)
+const blockWidth = ref<number>()
+const weekPlaceholder = ref<HTMLElement | null>(null)
+const weekWidth = ref<number>()
 
 const container = ref<HTMLElement | null>(null)
 
@@ -55,13 +60,35 @@ const readableDate = computed<string>((previousValue) => {
   return date.value ?? previousValue ?? ''
 })
 
+onMounted(() => {
+  const blockObserver = new MutationObserver(() => {
+    blockWidth.value = blockPlaceholder.value!.offsetWidth
+  })
+  blockObserver.observe(blockPlaceholder.value!, { childList: true, subtree: true })
+
+  const weekObserver = new MutationObserver(() => {
+    weekWidth.value = weekPlaceholder.value!.offsetWidth
+  })
+  weekObserver.observe(weekPlaceholder.value!, { childList: true, subtree: true })
+})
+
 useRefStore().set('toolbar', container)
 </script>
 
 <template>
   <nav class="navbar navbar-dark bg-dark bg-transparent" ref="container">
-    <div class="PVideoListToolbar-bg position-absolute top-0 start-0 w-100 bg-gradient z-1"></div>
-    <div class="container-fluid position-relative z-2">
+    <div class="navbar-brand position-absolute top-0 start-0 opacity-0 z-1">
+      <div ref="blockPlaceholder" class="d-inline-flex align-items-center">
+        <span>{{ readableBlock }}</span>
+        <PIcon :path="'mdiChevronRight'"></PIcon>
+      </div>
+      <div ref="weekPlaceholder" class="d-inline-flex align-items-center">
+        <span>{{ readableWeek }}</span>
+        <PIcon :path="'mdiChevronRight'"></PIcon>
+      </div>
+    </div>
+    <div class="position-absolute top-0 start-0 w-100 bg-gradient z-2"></div>
+    <div class="container-fluid position-relative z-3">
       <a
         class="navbar-brand visibility d-flex flex-wrap"
         :class="{ upper: isDateShown, show: isShown }"
@@ -77,7 +104,7 @@ useRefStore().set('toolbar', container)
               ></PIcon>
             </span>
           </PRollTransition>
-          <span class="opacity-0 pe-4">{{ readableBlock }}</span>
+          <span class="opacity-0 d-inline-block width" :style="{ width: `${blockWidth}px` }"></span>
         </div>
         <div class="visibility" :class="{ show: isWeekShown }">
           <PRollTransition>
@@ -90,7 +117,7 @@ useRefStore().set('toolbar', container)
               ></PIcon>
             </span>
           </PRollTransition>
-          <span class="opacity-0 pe-4">{{ readableWeek }}</span>
+          <span class="opacity-0 d-inline-block width" :style="{ width: `${weekWidth}px` }"></span>
         </div>
         <div class="visibility" :class="{ show: isWorkoutShown }">
           <PRollTransition>
@@ -140,5 +167,8 @@ useRefStore().set('toolbar', container)
     rgba(var(--bs-dark-rgb), 1),
     rgba(var(--bs-dark-rgb), 0)
   );
+}
+.width {
+  transition: width 0.5s ease-in-out;
 }
 </style>
