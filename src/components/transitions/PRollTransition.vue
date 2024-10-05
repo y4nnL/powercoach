@@ -5,7 +5,7 @@ import { toRefs } from 'vue'
 const { top: isMainScrollingUp, bottom: isMainScrollingDown } = toRefs(useMainScroll().directions)
 </script>
 <template>
-  <transition :name="`roll-${isMainScrollingUp ? 'up' : isMainScrollingDown ? 'down' : 'none'}`">
+  <transition :name="`roll-${isMainScrollingUp ? 'down' : isMainScrollingDown ? 'up' : 'none'}`">
     <slot></slot>
   </transition>
 </template>

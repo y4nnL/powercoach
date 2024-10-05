@@ -24,6 +24,6 @@ defineExpose({ container })
 
 <style scoped>
 .PBottomNavigation {
-  padding-bottom: var(--safe-area-bottom);
+  padding-bottom: var(--pc-area-bottom);
 }
 </style>

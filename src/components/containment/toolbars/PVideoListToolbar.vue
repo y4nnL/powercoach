@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRefStore } from '@/stores/ref'
-import PIcon from '@/components/icons/PIcon.vue'
 import { Scale, type Video } from '@/types'
 import { useHumanReadability } from '@/composables/useHumanReadability'
 import PRollTransition from '@/components/transitions/PRollTransition.vue'
+import PVideoListToolbarDivider from '@/components/containment/toolbars/PVideoListToolbarDivider.vue'
 
 export type PVideoListToolbarProps = {
   scale: Scale
@@ -80,28 +80,24 @@ useRefStore().set('toolbar', container)
     <div class="navbar-brand position-absolute top-0 start-0 opacity-0 z-1">
       <div ref="blockPlaceholder" class="d-inline-flex align-items-center">
         <span>{{ readableBlock }}</span>
-        <PIcon :path="'mdiChevronRight'"></PIcon>
+        <PVideoListToolbarDivider />
       </div>
       <div ref="weekPlaceholder" class="d-inline-flex align-items-center">
         <span>{{ readableWeek }}</span>
-        <PIcon :path="'mdiChevronRight'"></PIcon>
+        <PVideoListToolbarDivider />
       </div>
     </div>
-    <div class="position-absolute top-0 start-0 w-100 bg-gradient z-2"></div>
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient z-2"></div>
     <div class="container-fluid position-relative z-3">
       <a
-        class="navbar-brand visibility d-flex flex-wrap"
+        class="navbar-brand visibility d-flex flex-wrap ps-1"
         :class="{ upper: isDateShown, show: isShown }"
       >
         <div class="visibility" :class="{ show: isBlockShown }">
           <PRollTransition>
             <span class="position-absolute d-inline-flex align-items-center" :key="readableBlock">
               <span>{{ readableBlock }}</span>
-              <PIcon
-                class="visibility"
-                :class="{ show: isWeekShown }"
-                :path="'mdiChevronRight'"
-              ></PIcon>
+              <PVideoListToolbarDivider class="visibility" :class="{ show: isWeekShown }" />
             </span>
           </PRollTransition>
           <span class="opacity-0 d-inline-block width" :style="{ width: `${blockWidth}px` }"></span>
@@ -110,11 +106,7 @@ useRefStore().set('toolbar', container)
           <PRollTransition>
             <span class="position-absolute d-inline-flex align-items-center" :key="readableWeek">
               <span>{{ readableWeek }}</span>
-              <PIcon
-                class="visibility"
-                :class="{ show: isWorkoutShown }"
-                :path="'mdiChevronRight'"
-              ></PIcon>
+              <PVideoListToolbarDivider class="visibility" :class="{ show: isWorkoutShown }" />
             </span>
           </PRollTransition>
           <span class="opacity-0 d-inline-block width" :style="{ width: `${weekWidth}px` }"></span>
@@ -136,11 +128,17 @@ useRefStore().set('toolbar', container)
 
 <style scoped lang="scss">
 .navbar {
-  padding-top: calc(var(--safe-area-top) + 1rem);
+  padding-top: calc(max(env(--pc-area-top), var(--bs-navbar-padding-y)) + 2rem);
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
+.navbar-brand {
+  font-family: var(--pc-title-font-family);
+  .small {
+    font-family: var(--bs-body-font-family);
+  }
+}
 .date {
-  transform: translateY(-15%);
+  transform: translateY(-10%);
 }
 .visibility {
   transition: opacity 0.3s linear;
@@ -154,14 +152,13 @@ useRefStore().set('toolbar', container)
     transform 0.3s ease-in-out,
     opacity 0.3s linear;
   &.upper {
-    transform: translateY(-60%);
+    transform: translateY(-40%);
   }
 }
 .bg-gradient {
   pointer-events: none;
   backdrop-filter: blur(3px);
-  mask-image: linear-gradient(180deg, black 50%, transparent);
-  height: calc(100% + 1rem);
+  mask-image: linear-gradient(to bottom, black 50%, transparent);
   --bs-gradient: linear-gradient(
     to bottom,
     rgba(var(--bs-dark-rgb), 1),

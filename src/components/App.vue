@@ -43,11 +43,19 @@ useRefStore().set('main', main)
 $blue: #dbc078;
 $dark: #1c1c1c;
 
+@font-face {
+  font-family: 'Proelium';
+  src:
+    local('Proelium'),
+    url('@/assets/fonts/Proelium.otf') format('opentype');
+}
+
 :root {
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
+  --pc-area-top: env(safe-area-inset-top, 0px);
+  --pc-area-right: env(safe-area-inset-right, 0px);
+  --pc-area-bottom: env(safe-area-inset-bottom, 0px);
+  --pc-area-left: env(safe-area-inset-left, 0px);
+  --pc-title-font-family: 'Proelium';
 }
 
 body {
