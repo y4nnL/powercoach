@@ -67,4 +67,6 @@ export type Workout = {
   name?: string
 }
 
-export type VideoTag = 'comment' | 'fail' | 'great' | 'pass' | 'pb' | 'review'
+export const VideoTags = ['review', 'comment', 'pass', 'fail', 'great', 'pb'] as const
+
+export type VideoTag = (typeof VideoTags)[number]

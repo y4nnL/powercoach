@@ -7,5 +7,12 @@
   "common_week": "Semaine",
   "common_workout": "Séance",
   "date_fromTo": "Du {from} au {to}",
-  "date_on": "Le {date}"
+  "date_on": "Le {date}",
+  "video": "Vidéo | Vidéos",
+  "video_tag_adj_comment": "Commentée | Commentées",
+  "video_tag_adj_fail": "Refusée | Refusées",
+  "video_tag_adj_great": "Aimée | Aimées",
+  "video_tag_adj_pass": "Accordée | Accordées",
+  "video_tag_adj_pb": "Record | Records",
+  "video_tag_adj_review": "Revue | Revues"
 }

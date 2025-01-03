@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { type Video } from '@/types'
+import { type Video, type VideoTag, VideoTags } from '@/types'
 import PVideoListItem from '@/components/containment/lists/video/PVideoListItem.vue'
+import PVideoListGroupTag from '@/components/containment/lists/video/PVideoListGroupTag.vue'
+
+const DEFAULT_PREVIEW = 9
 
 export type PVideoListItemProps = {
   preview?: number
@@ -10,14 +13,20 @@ export type PVideoListItemProps = {
   videos: Video[]
 }
 
-const props = withDefaults(defineProps<PVideoListItemProps>(), { preview: 9 })
+const props = withDefaults(defineProps<PVideoListItemProps>(), { preview: DEFAULT_PREVIEW })
 
 const emit = defineEmits<{
   'click:video': [Video]
 }>()
 
 const previewedVideos = computed<Video[]>(() => props.videos.slice(0, props.preview))
-const more = computed<number>(() => props.videos.length - props.preview)
+const hiddenVideos = computed<Video[]>(() => props.videos.slice(props.preview))
+const tags = computed<VideoTag[]>(
+  () =>
+    VideoTags.map((tag) =>
+      props.videos.flatMap(({ tags }) => tags).includes(tag) ? tag : null
+    ).filter(Boolean) as VideoTag[]
+)
 </script>
 
 <template>
@@ -33,11 +42,19 @@ const more = computed<number>(() => props.videos.length - props.preview)
       >
         <template #overlay>
           <div
-            v-if="more > 0 && index === previewedVideos.length - 1"
-            class="card-img-overlay bg-dark text-bg-dark d-flex justify-content-center align-items-center display-2 rounded-0"
+            v-if="hiddenVideos.length > 0 && index === previewedVideos.length - 1"
+            class="card-img-overlay d-flex align-items-center justify-content-center bg-dark rounded-0"
             style="--bs-bg-opacity: 0.9"
           >
-            <span class="opacity-75">+{{ more }}</span>
+            <div class="text-bg-dark d-flex flex-column" style="--bs-bg-opacity: 0">
+              <PVideoListGroupTag class="mb-1" :videos="props.videos"></PVideoListGroupTag>
+              <PVideoListGroupTag
+                v-for="tag in tags"
+                :key="tag"
+                :tag="tag"
+                :videos="props.videos"
+              ></PVideoListGroupTag>
+            </div>
           </div>
           <div v-else></div>
         </template>
