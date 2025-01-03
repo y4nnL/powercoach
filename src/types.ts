@@ -24,7 +24,7 @@ export enum ExerciseType {
 
 export enum Lift {
   Squat = 'squat',
-  BenchPress = 'benchpress',
+  BenchPress = 'bench_press',
   Deadlift = 'deadlift'
 }
 

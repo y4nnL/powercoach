@@ -29,7 +29,7 @@ const more = computed<number>(() => props.videos.length - props.preview)
         :id="id"
         :key="id"
         :video="{ id, ...video }"
-        @click="(video) => emit('click:video', video)"
+        @click="(videoListItem) => emit('click:video', videoListItem)"
       >
         <template #overlay>
           <div

@@ -132,9 +132,9 @@ useRefStore().set('toolbar', container)
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 .navbar-brand {
-  font-family: var(--pc-title-font-family);
+  font-family: var(--pc-title-font-family), sans-serif;
   .small {
-    font-family: var(--bs-body-font-family);
+    font-family: var(--bs-body-font-family), sans-serif;
   }
 }
 .date {

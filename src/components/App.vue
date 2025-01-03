@@ -14,7 +14,7 @@ const pBottomNavigationHeight = computed<number>(
   () => pBottomNavigation.value?.container?.clientHeight ?? 0
 )
 
-const { reticle } = useDebugStore()
+const { reticule } = useDebugStore()
 
 useRefStore().set('main', main)
 </script>
@@ -32,7 +32,7 @@ useRefStore().set('main', main)
     <PBottomNavigation ref="pBottomNavigation" />
   </div>
   <PIcon
-    v-if="reticle"
+    v-if="reticule"
     :path="'mdiPlus'"
     class="position-absolute translate-middle text-danger start-50 top-50"
     style="z-index: 1000000"

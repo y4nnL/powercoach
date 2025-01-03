@@ -16,8 +16,8 @@ const scale = ref<Scale>(Scale.All)
 
 const video = ref<Video>()
 
-const onIntersect = (insectedVideo?: Video) => {
-  video.value = insectedVideo
+const onIntersect = (intersectedVideo?: Video) => {
+  video.value = intersectedVideo
 }
 </script>
 

@@ -73,7 +73,7 @@ const variants: Exercise[] = [
   type: ExerciseType.Variant
 }))
 
-const legsAccessories: Exercise[] = [
+const legAccessories: Exercise[] = [
   'Leg extension',
   'Leg curl',
   'Hack squat',
@@ -107,7 +107,7 @@ const chestAccessories: Exercise[] = [
   type: ExerciseType.Accessory
 }))
 
-const armsAccessories: Exercise[] = [
+const armAccessories: Exercise[] = [
   'Barbell biceps curl',
   'Dumbbell biceps curl',
   'Low pulley biceps curl',
@@ -121,7 +121,7 @@ const armsAccessories: Exercise[] = [
   type: ExerciseType.Accessory
 }))
 
-const shouldersAccessories: Exercise[] = [
+const shoulderAccessories: Exercise[] = [
   'Dumbbell side lateral raise',
   'Cable side lateral raise',
   'Cable reverse fly',
@@ -147,7 +147,7 @@ const backAccessories: Exercise[] = [
   type: ExerciseType.Accessory
 }))
 
-const abdominalsAccessories: Exercise[] = [
+const abdominalAccessories: Exercise[] = [
   'Plank',
   'Hollow extension',
   'Bird dog',
@@ -164,10 +164,10 @@ const exercises: Exercise[] = [
   ...variants,
   ...chestAccessories,
   ...backAccessories,
-  ...legsAccessories,
-  ...armsAccessories,
-  ...shouldersAccessories,
-  ...abdominalsAccessories
+  ...legAccessories,
+  ...armAccessories,
+  ...shoulderAccessories,
+  ...abdominalAccessories
 ]
 
 export default exercises

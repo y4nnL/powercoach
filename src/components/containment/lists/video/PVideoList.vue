@@ -155,7 +155,7 @@ function updateAll() {
   updateIntersection()
 }
 
-function zoomIn(group: VideoGroup, scale: Scale, id: string) {
+function zoomIn(group: VideoGroup, scale: Scale) {
   anchors.value = group.anchors
   emit('update:scale', scale)
 }
@@ -212,7 +212,7 @@ watch(mainScrollY, updateAll)
               :preview="blockVideosPreview"
               :data-intersection-id="group.videos[0].id"
               :data-anchors="JSON.stringify(group.anchors)"
-              @click:video="({ id }) => zoomIn(group, Scale.Week, id)"
+              @click:video="() => zoomIn(group, Scale.Week)"
               v-intersect="{
                 on: (is: boolean) => (intersections[group.videos[0].id] = is),
                 options: intersectionOptions
@@ -241,7 +241,7 @@ watch(mainScrollY, updateAll)
                 on: (visible: boolean) => (intersections[group.videos[0].id] = visible),
                 options: intersectionOptions
               }"
-              @click:video="({ id }) => zoomIn({ block, week, ...group }, Scale.Workout, id)"
+              @click:video="() => zoomIn({ block, week, ...group }, Scale.Workout)"
             ></PVideoListGroup>
           </div>
         </div>
@@ -272,7 +272,7 @@ watch(mainScrollY, updateAll)
                 on: (is: boolean) => (intersections[group.videos[0].id] = is),
                 options: intersectionOptions
               }"
-              @click:video="({ id }) => zoomIn({ block, week, workout, ...group }, Scale.All, id)"
+              @click:video="() => zoomIn({ block, week, workout, ...group }, Scale.All)"
             ></PVideoListGroup>
           </div>
         </div>
@@ -284,7 +284,6 @@ watch(mainScrollY, updateAll)
 
 <style>
 .PVideoList,
-.PVideoList .container,
 .PVideoList .container-fluid,
 .PVideoList .row,
 .PVideoList .col {
