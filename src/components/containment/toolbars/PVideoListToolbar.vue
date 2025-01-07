@@ -128,11 +128,11 @@ useRefStore().set('toolbar', container)
 
 <style scoped lang="scss">
 .navbar {
-  padding-top: calc(max(env(--pc-area-top), var(--bs-navbar-padding-y)) + 2rem);
+  padding-top: calc(max(var(--p-area-top), var(--bs-navbar-padding-y)) + 1rem) !important;
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 .navbar-brand {
-  font-family: var(--pc-title-font-family), sans-serif;
+  font-family: var(--p-title-font-family), sans-serif;
   .small {
     font-family: var(--bs-body-font-family), sans-serif;
   }

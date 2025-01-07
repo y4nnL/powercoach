@@ -43,12 +43,11 @@ const emit = defineEmits<{
 }>()
 
 const intersections = ref<Record<string, boolean>>({})
-
 const container = ref<HTMLElement | null>(null)
 
 const main = useRefStore().get('main')
-
 const toolbar = useRefStore().get('toolbar')
+const fixedBottom = useRefStore().get('fixedBottom')
 
 const anchors = ref<PVideoListTransitionProps['anchors']>()
 
@@ -88,6 +87,10 @@ const groups = computed<VideoGroup[] | null>(() => {
 
 const toolbarHeight = computed<number>(() => {
   return toolbar.value?.clientHeight ?? 0
+})
+
+const fixedBottomHeight = computed<number>(() => {
+  return fixedBottom.value?.clientHeight ?? 0
 })
 
 const intersectionOptions = computed(() => ({
@@ -174,6 +177,7 @@ watch(mainScrollY, updateAll)
     <PVideoListTransition
       :scale="scale"
       :anchors="anchors"
+      :offset-bottom="fixedBottomHeight"
       :offset-top="toolbarHeight"
       @complete="onTransitionComplete"
       @progress="updateDivider"

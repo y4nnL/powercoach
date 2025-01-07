@@ -28,7 +28,7 @@ const onIntersect = (intersectedVideo?: Video) => {
       <PVideoList v-model:scale="scale" :videos="videos" @intersect="onIntersect" />
       <Teleport to="#fixed-bottom">
         <PScaleButtonGroup
-          class="w-100 mb-2"
+          class="PScaleButtonGroup w-100"
           v-model:scale="scale"
           :all-message="t('PVideosRoute_allVideos')"
         />
@@ -36,3 +36,12 @@ const onIntersect = (intersectedVideo?: Video) => {
     </template>
   </PLoader>
 </template>
+
+<style lang="scss">
+.PVideoList {
+  padding-bottom: 2.5rem !important;
+}
+.PScaleButtonGroup {
+  height: 2.5rem;
+}
+</style>

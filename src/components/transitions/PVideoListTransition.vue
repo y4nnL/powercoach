@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { nextTick, ref, watch, watchEffect } from 'vue'
 import anime from 'animejs'
+import { debounce } from 'lodash'
 import { Scale } from '@/types'
 import { useRefStore } from '@/stores/ref'
-import { debounce } from 'lodash'
+import { usePointerEvents } from '@/composables/usePointerEvents'
 
 export type PVideoListTransitionProps = {
   anchors?: { [scale in Scale]?: string }
-  offsetTop: number
+  offsetBottom?: number
+  offsetTop?: number
   scale: Scale
 }
 
@@ -15,7 +17,10 @@ const DURATION = 250
 const DELAY = DURATION / 2
 const SCALE = 0.2
 
-const props = defineProps<PVideoListTransitionProps>()
+const props = withDefaults(defineProps<PVideoListTransitionProps>(), {
+  offsetBottom: 0,
+  offsetTop: 0
+})
 
 const emit = defineEmits<{
   complete: [scrollY: number]
@@ -41,6 +46,8 @@ const leave = ref<{ el: HTMLElement; done: () => void }>()
 const main = useRefStore().get('main')
 
 function transition() {
+  usePointerEvents(false)
+
   const { innerHeight: viewportHeight } = window
   const mainHeight = main.value!.getBoundingClientRect().height
 
@@ -58,7 +65,8 @@ function transition() {
   if (anchor) {
     const enterDOMRect = enter.value!.el.getBoundingClientRect()
     anchorOffset = anchor.getBoundingClientRect().top - enterDOMRect.top + 1
-    const enterOffsetHeight = enterDOMRect.height + props.offsetTop - anchorOffset
+    const enterOffsetHeight =
+      enterDOMRect.height + props.offsetTop + props.offsetBottom - anchorOffset
     if (enterOffsetHeight < mainHeight) {
       anchorOffset -= mainHeight - enterOffsetHeight
     }
@@ -118,11 +126,16 @@ function transition() {
     leave.value!.done()
     enter.value = undefined
     leave.value = undefined
-    nextTick(() => emit('complete', anchorOffset))
+    nextTick(() => {
+      usePointerEvents(true)
+      emit('complete', anchorOffset)
+    })
   })
 }
 
 function transitionAppear() {
+  usePointerEvents(false)
+
   let transformOrigin = `50% ${window.innerHeight / 2}px`
 
   Promise.all([
@@ -148,7 +161,10 @@ function transitionAppear() {
     enter.value!.el.removeAttribute('style')
     enter.value!.done()
     enter.value = undefined
-    nextTick(() => emit('complete', 0))
+    nextTick(() => {
+      usePointerEvents(true)
+      emit('complete', 0)
+    })
   })
 }
 

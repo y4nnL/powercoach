@@ -44,7 +44,7 @@ if (!cached.value) {
       >
         <img :src="data" class="bg-dark" alt="photo" />
         <slot name="overlay">
-          <div class="card-img-overlay d-flex align-items-end m-0 p-0">
+          <div v-if="video.tags.length" class="card-img-overlay d-flex align-items-end m-0 p-0">
             <div class="w-100 bg-dark text-bg-dark d-flex gap-1 p-1" style="--bs-bg-opacity: 0.3">
               <PTagIcon v-for="tag in video.tags" :key="tag" :tag="tag" :size="14" />
             </div>

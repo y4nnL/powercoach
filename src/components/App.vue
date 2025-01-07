@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import 'bootstrap'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import { useRefStore } from '@/stores/ref'
 import { useDebugStore } from '@/stores/debug'
 import PIcon from '@/components/icons/PIcon.vue'
 
 const main = ref<HTMLElement | null>(null)
-
+const fixedBottom = ref<HTMLElement | null>(null)
+const fixedBottomBottom = ref<number>(0)
 const pBottomNavigation = ref<InstanceType<typeof PBottomNavigation>>()
-
-const pBottomNavigationHeight = computed<number>(
-  () => pBottomNavigation.value?.container?.clientHeight ?? 0
-)
 
 const { reticule } = useDebugStore()
 
 useRefStore().set('main', main)
+useRefStore().set('fixedBottom', fixedBottom)
+
+useResizeObserver(pBottomNavigation, ([{ contentRect }]) => {
+  fixedBottomBottom.value = contentRect.bottom
+})
 </script>
 
 <template>
@@ -25,9 +28,10 @@ useRefStore().set('main', main)
       <RouterView />
     </div>
     <div
+      ref="fixedBottom"
       id="fixed-bottom"
       class="fixed-bottom w-100"
-      :style="{ bottom: `${pBottomNavigationHeight}px !important` }"
+      :style="{ bottom: `${fixedBottomBottom}px !important` }"
     ></div>
     <PBottomNavigation ref="pBottomNavigation" />
   </div>
@@ -51,11 +55,11 @@ $dark: #1c1c1c;
 }
 
 :root {
-  --pc-area-top: env(safe-area-inset-top, 0px);
-  --pc-area-right: env(safe-area-inset-right, 0px);
-  --pc-area-bottom: env(safe-area-inset-bottom, 0px);
-  --pc-area-left: env(safe-area-inset-left, 0px);
-  --pc-title-font-family: 'Proelium';
+  --p-area-top: env(safe-area-inset-top, 0px);
+  --p-area-right: env(safe-area-inset-right, 0px);
+  --p-area-bottom: env(safe-area-inset-bottom, 0px);
+  --p-area-left: env(safe-area-inset-left, 0px);
+  --p-title-font-family: 'Proelium';
 }
 
 body {
