@@ -1,8 +1,13 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import PVideosRoute from '@/components/routes/PVideosRoute.vue'
 import PVideoRoute from '@/components/routes/PVideoRoute.vue'
+import PHomeRoute from '@/components/routes/PHomeRoute.vue'
 
 const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    component: PHomeRoute
+  },
   {
     path: '/videos',
     children: [

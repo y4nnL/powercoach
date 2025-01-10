@@ -7,6 +7,7 @@ import PLoader from '@/components/containment/loaders/PLoader.vue'
 import PScaleButtonGroup from '@/components/containment/buttons/PScaleButtonGroup.vue'
 import { useVideosQuery } from '@/composables/useVideosQuery'
 import { Scale, type Video } from '@/types'
+import PSlideTransition from '@/components/transitions/PSlideTransition.vue'
 
 const { t } = useI18n()
 
@@ -26,22 +27,16 @@ const onIntersect = (intersectedVideo?: Video) => {
     <template #default="{ data: videos }">
       <PVideoListToolbar class="sticky-top" :scale="scale" :video="video" />
       <PVideoList v-model:scale="scale" :videos="videos" @intersect="onIntersect" />
-      <Teleport to="#fixed-bottom">
-        <PScaleButtonGroup
-          class="PScaleButtonGroup w-100"
-          v-model:scale="scale"
-          :all-message="t('PVideosRoute_allVideos')"
-        />
+      <Teleport to="#bottom">
+        <PSlideTransition>
+          <PScaleButtonGroup
+            key="PVideosRoute_PScaleButtonGroup"
+            class="w-100"
+            v-model:scale="scale"
+            :all-message="t('PVideosRoute_allVideos')"
+          />
+        </PSlideTransition>
       </Teleport>
     </template>
   </PLoader>
 </template>
-
-<style lang="scss">
-.PVideoList {
-  padding-bottom: 2.5rem !important;
-}
-.PScaleButtonGroup {
-  height: 2.5rem;
-}
-</style>

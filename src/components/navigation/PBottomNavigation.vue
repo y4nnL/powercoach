@@ -13,6 +13,11 @@ defineExpose({ container })
     <div class="PBottomNavigationCollapse collapse navbar-collapse">
       <ul class="navbar-nav w-100 justify-content-center">
         <li class="nav-item">
+          <RouterLink class="nav-link" :active-class="'active'" to="/">
+            <PIcon path="mdiHome" :size="30" />
+          </RouterLink>
+        </li>
+        <li class="nav-item">
           <RouterLink class="nav-link" :active-class="'active'" to="/videos">
             <PIcon path="mdiVideo" :size="30" />
           </RouterLink>

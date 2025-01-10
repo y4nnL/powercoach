@@ -1,39 +1,27 @@
 <script setup lang="ts">
 import 'bootstrap'
 import { ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
-import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import { useRefStore } from '@/stores/ref'
 import { useDebugStore } from '@/stores/debug'
+import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import PIcon from '@/components/icons/PIcon.vue'
 
 const main = ref<HTMLElement | null>(null)
-const fixedBottom = ref<HTMLElement | null>(null)
-const fixedBottomBottom = ref<number>(0)
-const pBottomNavigation = ref<InstanceType<typeof PBottomNavigation>>()
 
 const { reticule } = useDebugStore()
 
 useRefStore().set('main', main)
-useRefStore().set('fixedBottom', fixedBottom)
-
-useResizeObserver(pBottomNavigation, ([{ contentRect }]) => {
-  fixedBottomBottom.value = contentRect.bottom
-})
 </script>
 
 <template>
-  <div class="vh-100 d-flex flex-column">
+  <div class="h-100 d-flex flex-column">
     <div ref="main" class="h-100 overflow-scroll">
       <RouterView />
     </div>
-    <div
-      ref="fixedBottom"
-      id="fixed-bottom"
-      class="fixed-bottom w-100"
-      :style="{ bottom: `${fixedBottomBottom}px !important` }"
-    ></div>
-    <PBottomNavigation ref="pBottomNavigation" />
+    <div class="w-100 d-flex flex-column">
+      <div id="bottom" class="position-relative z-1"></div>
+      <PBottomNavigation class="position-relative z-2" />
+    </div>
   </div>
   <PIcon
     v-if="reticule"
