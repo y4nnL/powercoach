@@ -20,7 +20,7 @@ const { data, isPending } = props.query
   <template v-if="isPending">
     <slot name="pending">
       <div class="h-100 d-flex flex-column justify-content-center align-items-center">
-        <span class="spinner-border" aria-hidden="true"></span>
+        <span class="spinner-border text-light" aria-hidden="true"></span>
       </div>
     </slot>
   </template>

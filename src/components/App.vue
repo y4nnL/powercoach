@@ -3,19 +3,42 @@ import 'bootstrap'
 import { ref } from 'vue'
 import { useRefStore } from '@/stores/ref'
 import { useDebugStore } from '@/stores/debug'
+import { useMutationObserver } from '@vueuse/core'
 import PBottomNavigation from '@/components/navigation/PBottomNavigation.vue'
 import PIcon from '@/components/icons/PIcon.vue'
 
 const main = ref<HTMLElement | null>(null)
+const modal = ref<HTMLElement | null>(null)
 
 const { reticule } = useDebugStore()
 
+const hasModal = ref<boolean>(false)
+
 useRefStore().set('main', main)
+
+useMutationObserver(
+  modal,
+  (entries) => {
+    hasModal.value = entries
+      .flatMap(({ addedNodes }) => [...addedNodes].some((node) => node.nodeType === 1))
+      .some(Boolean)
+  },
+  { childList: true }
+)
 </script>
 
 <template>
   <div class="h-100 d-flex flex-column">
-    <div ref="main" class="h-100 overflow-scroll">
+    <div
+      id="main"
+      ref="main"
+      class="h-100 overflow-x-hidden"
+      :class="{
+        hasModal,
+        'overflow-y-scroll': !hasModal,
+        'overflow-y-hidden': hasModal
+      }"
+    >
       <RouterView />
     </div>
     <div class="w-100 d-flex flex-column">
@@ -29,6 +52,7 @@ useRefStore().set('main', main)
     class="position-absolute translate-middle text-danger start-50 top-50"
     style="z-index: 1000000"
   ></PIcon>
+  <div id="modal" ref="modal"></div>
 </template>
 
 <style lang="scss">
@@ -52,6 +76,13 @@ $dark: #1c1c1c;
 
 body {
   --bs-body-bg: rgb(var(--bs-dark-rgb));
+}
+
+#main {
+  transition: transform ease-out 0.3s;
+  &.hasModal {
+    transform: scale(0.97);
+  }
 }
 
 @import 'bootstrap/scss/bootstrap.scss';

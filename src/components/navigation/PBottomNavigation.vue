@@ -11,7 +11,7 @@ defineExpose({ container })
 <template>
   <nav class="navbar navbar-expand navbar-dark bg-dark p-1" ref="container">
     <div class="PBottomNavigationCollapse collapse navbar-collapse">
-      <ul class="navbar-nav w-100 justify-content-center">
+      <ul class="navbar-nav w-100 justify-content-around">
         <li class="nav-item">
           <RouterLink class="nav-link" :active-class="'active'" to="/">
             <PIcon path="mdiHome" :size="30" />

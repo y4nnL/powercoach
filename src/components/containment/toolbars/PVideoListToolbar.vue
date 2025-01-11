@@ -5,14 +5,21 @@ import { Scale, type Video } from '@/types'
 import { useHumanReadability } from '@/composables/useHumanReadability'
 import PRollTransition from '@/components/transitions/PRollTransition.vue'
 import PVideoListToolbarDivider from '@/components/containment/toolbars/PVideoListToolbarDivider.vue'
+import PToolbarButton from '@/components/containment/buttons/PToolbarButton.vue'
 
 export type PVideoListToolbarProps = {
+  activateFilters?: boolean
+  filters?: number
   scale: Scale
   throttle?: number
   video?: Video
 }
 
 const props = withDefaults(defineProps<PVideoListToolbarProps>(), { throttle: 500 })
+
+const emit = defineEmits<{
+  'click:filters': []
+}>()
 
 const { blockName, weekName, workoutName, videoDate } = useHumanReadability()
 
@@ -76,7 +83,7 @@ useRefStore().set('toolbar', container)
 </script>
 
 <template>
-  <nav class="navbar navbar-dark bg-dark bg-transparent" ref="container">
+  <nav class="navbar bg-transparent" ref="container">
     <div class="navbar-brand position-absolute top-0 start-0 opacity-0 z-1">
       <div ref="blockPlaceholder" class="d-inline-flex align-items-center">
         <span>{{ readableBlock }}</span>
@@ -88,9 +95,9 @@ useRefStore().set('toolbar', container)
       </div>
     </div>
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient z-2"></div>
-    <div class="container-fluid position-relative z-3">
+    <div class="d-flex justify-content-between position-relative z-3 w-100 ps-3">
       <a
-        class="navbar-brand visibility d-flex flex-wrap ps-1"
+        class="navbar-brand visibility d-flex flex-wrap text-light"
         :class="{ upper: isDateShown, show: isShown }"
       >
         <div class="visibility" :class="{ show: isBlockShown }">
@@ -122,6 +129,16 @@ useRefStore().set('toolbar', container)
           <span class="position-absolute date">{{ readableDate }}</span>
         </div>
       </a>
+      <div class="d-flex text-light pe-3">
+        <div class="position-relative visibility show">
+          <PToolbarButton
+            icon="mdiTuneVariant"
+            :active="activateFilters"
+            :badge="0"
+            @click="() => emit('click:filters')"
+          ></PToolbarButton>
+        </div>
+      </div>
     </div>
   </nav>
 </template>
