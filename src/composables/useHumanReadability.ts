@@ -2,12 +2,12 @@ import { useI18n } from 'vue-i18n'
 import { type Block, type Video, type Week, type Workout } from '@/types'
 
 export type HumanReadability = {
-  blockName(block: Block): string
+  blockName(block: Block | Pick<Block, 'index' | 'name'>): string
   blockScaleDate(videos: Video[]): string
   videoDate(video: Video): string
-  weekName(week: Week): string
+  weekName(week: Week | Pick<Week, 'index' | 'name'>): string
   weekScaleDate(videos: Video[]): string
-  workoutName(workout: Workout): string
+  workoutName(workout: Workout | Pick<Workout, 'index' | 'name'>): string
   workoutScaleDate(videos: Video[]): string
 }
 

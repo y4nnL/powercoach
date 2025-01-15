@@ -200,7 +200,11 @@ watch(mainScrollY, updateAll)
       </div>
       <template v-if="groups">
         <div v-if="scale === Scale.Block" key="block" class="row">
-          <div class="col col-12" v-for="(group, i) in groups" :key="group.block.id">
+          <div
+            class="PVideoListGroup col col-12"
+            v-for="(group, i) in groups"
+            :key="group.block.id"
+          >
             <PVideoListDivider v-if="i > 0"></PVideoListDivider>
             <PVideoListGroup
               :id="group.block.id"
@@ -219,7 +223,11 @@ watch(mainScrollY, updateAll)
           </div>
         </div>
         <div v-else-if="scale === Scale.Week" key="week" class="row">
-          <div class="col col-12" v-for="({ block, week, ...group }, i) in groups" :key="week.id">
+          <div
+            class="PVideoListGroup col col-12"
+            v-for="({ block, week, ...group }, i) in groups"
+            :key="week.id"
+          >
             <PVideoListDivider
               v-if="i > 0 && block.id !== groups[i - 1].block.id"
               :title="blockName(block)"
@@ -245,7 +253,7 @@ watch(mainScrollY, updateAll)
         </div>
         <div v-else-if="scale === Scale.Workout" key="workout" class="row">
           <div
-            class="col col-12"
+            class="PVideoListGroup col col-12"
             v-for="({ block, week, workout, ...group }, i) in groups"
             :key="workout.id"
           >
@@ -287,5 +295,8 @@ watch(mainScrollY, updateAll)
 .PVideoList .col {
   margin: 0 !important;
   padding: 0 !important;
+}
+.PVideoList .PVideoListGroup.col:last-child {
+  margin-bottom: 0.75rem !important;
 }
 </style>

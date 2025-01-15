@@ -30,44 +30,53 @@ const tags = computed<VideoTag[]>(
 </script>
 
 <template>
-  <div class="container-fluid position-relative">
-    <div class="row">
-      <PVideoListItem
-        v-for="({ id, ...video }, index) in previewedVideos"
-        class="col-4 col-md-2 gx-0"
-        :id="id"
-        :key="id"
-        :video="{ id, ...video }"
-        @click="(videoListItem) => emit('click:video', videoListItem)"
-      >
-        <template #overlay>
-          <div
-            v-if="hiddenVideos.length > 0 && index === previewedVideos.length - 1"
-            class="card-img-overlay d-flex align-items-center justify-content-center bg-dark rounded-0"
-            style="--bs-bg-opacity: 0.9"
-          >
-            <div class="text-bg-dark d-flex flex-column" style="--bs-bg-opacity: 0">
-              <PVideoListGroupTag class="mb-1" :videos="props.videos"></PVideoListGroupTag>
-              <PVideoListGroupTag
-                v-for="tag in tags"
-                :key="tag"
-                :tag="tag"
-                :videos="props.videos"
-              ></PVideoListGroupTag>
+  <div class="container-fluid">
+    <div class="row gx-4 gy-1">
+      <div class="col-12">
+        <div
+          class="container-fluid position-relative"
+          style="--bs-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5)"
+        >
+          <div class="row rounded-4 overflow-hidden shadow">
+            <PVideoListItem
+              v-for="({ id, ...video }, index) in previewedVideos"
+              class="col-4 col-md-2 gx-0"
+              :id="id"
+              :key="id"
+              :video="{ id, ...video }"
+              @click="(videoListItem) => emit('click:video', videoListItem)"
+            >
+              <template #overlay>
+                <div
+                  v-if="hiddenVideos.length > 0 && index === previewedVideos.length - 1"
+                  class="card-img-overlay d-flex align-items-center justify-content-center bg-dark rounded-0"
+                  style="--bs-bg-opacity: 0.9"
+                >
+                  <div class="text-bg-dark d-flex flex-column" style="--bs-bg-opacity: 0">
+                    <PVideoListGroupTag class="mb-1" :videos="props.videos"></PVideoListGroupTag>
+                    <PVideoListGroupTag
+                      v-for="tag in tags"
+                      :key="tag"
+                      :tag="tag"
+                      :videos="props.videos"
+                    ></PVideoListGroupTag>
+                  </div>
+                </div>
+                <div v-else></div>
+              </template>
+            </PVideoListItem>
+            <div
+              class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 bg-dark bg-gradient text-bg-dark rounded-4"
+              style="
+                --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+                --bs-bg-opacity: 0;
+              "
+            >
+              <h5 class="card-title">{{ props.title }}</h5>
+              <h6 class="card-subtitle text-dark-subtle small opacity-75">{{ props.subtitle }}</h6>
             </div>
           </div>
-          <div v-else></div>
-        </template>
-      </PVideoListItem>
-      <div
-        class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 bg-dark bg-gradient text-bg-dark"
-        style="
-          --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
-          --bs-bg-opacity: 0;
-        "
-      >
-        <h5 class="card-title">{{ props.title }}</h5>
-        <h6 class="card-subtitle text-dark-subtle small opacity-75">{{ props.subtitle }}</h6>
+        </div>
       </div>
     </div>
   </div>

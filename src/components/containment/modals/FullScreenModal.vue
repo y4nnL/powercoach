@@ -4,13 +4,17 @@ import PFadeTransition from '@/components/transitions/PFadeTransition.vue'
 import { useRefStore } from '@/stores/ref'
 import { computed } from 'vue'
 
-export type BackdropTeleportProps = {
-  show: boolean
+export type FullScreenModalProps = {
+  dimBackdrop?: boolean
   offset?: number
+  show: boolean
+  snapToolbar?: boolean
 }
 
-const props = withDefaults(defineProps<BackdropTeleportProps>(), {
-  offset: 0
+const props = withDefaults(defineProps<FullScreenModalProps>(), {
+  dimBackdrop: true,
+  offset: 0,
+  snapToolbar: false
 })
 
 const emits = defineEmits<{
@@ -18,7 +22,9 @@ const emits = defineEmits<{
 }>()
 
 const toolbar = useRefStore().get('toolbar')
-const offsetStart = computed<number>(() => (toolbar.value?.clientHeight ?? 0) + props.offset)
+const offsetStart = computed<number>(
+  () => (props.snapToolbar ? (toolbar.value?.clientHeight ?? 0) : 0) + props.offset
+)
 </script>
 
 <template>
@@ -27,7 +33,7 @@ const offsetStart = computed<number>(() => (toolbar.value?.clientHeight ?? 0) + 
       <div
         v-if="props.show"
         class="position-absolute top-0 left-0 w-100 h-100 modal-backdrop"
-        style="--bs-backdrop-bg: rgba(0, 0, 0, 0.3)"
+        :style="`--bs-backdrop-bg: rgba(0, 0, 0, ${props.dimBackdrop ? 0.5 : 0})`"
         @click="emits('close')"
       ></div>
     </PFadeTransition>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Scale } from '@/types'
+import { type Message, Scale } from '@/types'
 
 type PScaleButtonGroupProps = {
   allMessage?: string
   scales?: Scale[]
 }
 
-const { t } = useI18n()
+const { t } = useI18n<{ message: Message }>()
 
 const props = withDefaults(defineProps<PScaleButtonGroupProps>(), {
   scales: () => [Scale.Block, Scale.Week, Scale.Workout, Scale.All]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { type Video, type VideoTag } from '@/types'
+import { type Message, type Video, type VideoTag } from '@/types'
 import PTagIcon from '@/components/icons/PTagIcon.vue'
 
 export type PVideoListItemProps = {
@@ -11,7 +11,7 @@ export type PVideoListItemProps = {
 
 const props = defineProps<PVideoListItemProps>()
 
-const { t } = useI18n()
+const { t } = useI18n<{ message: Message }>()
 
 const count = computed<number>(() =>
   props.tag

@@ -1,3 +1,5 @@
+import messages from '@/locales'
+
 export type API = {
   getVideo: (id: string) => Promise<Video>
   getVideos: () => Promise<Video[]>
@@ -70,3 +72,5 @@ export type Workout = {
 export const VideoTags = ['review', 'comment', 'pass', 'fail', 'great', 'pb'] as const
 
 export type VideoTag = (typeof VideoTags)[number]
+
+export type Message = (typeof messages)['fr']

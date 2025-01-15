@@ -2,9 +2,10 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { VueQueryPlugin } from '@tanstack/vue-query'
+import { type Message } from '@/types'
 import messages from '@/locales'
 
-const i18n = createI18n({
+const i18n = createI18n<[Message], 'fr'>({
   locale: 'fr',
   messages
 })

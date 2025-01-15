@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import { useRefStore } from '@/stores/ref'
 import { Scale, type Video } from '@/types'
 import { useHumanReadability } from '@/composables/useHumanReadability'
@@ -21,14 +22,13 @@ const emit = defineEmits<{
   'click:filters': []
 }>()
 
-const { blockName, weekName, workoutName, videoDate } = useHumanReadability()
-
 const blockPlaceholder = ref<HTMLElement | null>(null)
 const blockWidth = ref<number>()
 const weekPlaceholder = ref<HTMLElement | null>(null)
 const weekWidth = ref<number>()
-
 const container = ref<HTMLElement | null>(null)
+
+const { blockName, weekName, workoutName, videoDate } = useHumanReadability()
 
 const block = computed<string | undefined>(() =>
   props.video && props.scale !== Scale.Block ? blockName(props.video.block) : undefined
@@ -44,41 +44,30 @@ const workout = computed<string | undefined>(() =>
 const date = computed<string | undefined>(() =>
   props.video && props.scale === Scale.All ? videoDate(props.video) : undefined
 )
-
 const isBlockShown = computed<boolean>(() => props.scale !== Scale.Block)
 const isWeekShown = computed<boolean>(() => isBlockShown.value && Boolean(week.value))
 const isWorkoutShown = computed<boolean>(() => isWeekShown.value && Boolean(workout.value))
 const isDateShown = computed<boolean>(() => isWorkoutShown.value && Boolean(date.value))
 const isShown = computed<boolean>(() => isBlockShown.value)
-
 const readableBlock = computed<string>((previousValue) => {
   return block.value ?? previousValue ?? ''
 })
-
 const readableWeek = computed<string>((previousValue) => {
   return week.value ?? previousValue ?? ''
 })
-
 const readableWorkout = computed<string>((previousValue) => {
   return workout.value ?? previousValue ?? ''
 })
-
 const readableDate = computed<string>((previousValue) => {
   return date.value ?? previousValue ?? ''
 })
 
-onMounted(() => {
-  const blockObserver = new MutationObserver(() => {
-    blockWidth.value = blockPlaceholder.value!.offsetWidth
-  })
-  blockObserver.observe(blockPlaceholder.value!, { childList: true, subtree: true })
-
-  const weekObserver = new MutationObserver(() => {
-    weekWidth.value = weekPlaceholder.value!.offsetWidth
-  })
-  weekObserver.observe(weekPlaceholder.value!, { childList: true, subtree: true })
+useResizeObserver(blockPlaceholder, ([{ contentRect }]) => {
+  blockWidth.value = contentRect.width
 })
-
+useResizeObserver(weekPlaceholder, ([{ contentRect }]) => {
+  weekWidth.value = contentRect.width
+})
 useRefStore().set('toolbar', container)
 </script>
 
@@ -86,11 +75,11 @@ useRefStore().set('toolbar', container)
   <nav class="navbar bg-transparent" ref="container">
     <div class="navbar-brand position-absolute top-0 start-0 opacity-0 z-1">
       <div ref="blockPlaceholder" class="d-inline-flex align-items-center">
-        <span>{{ readableBlock }}</span>
+        <span>{{ readableBlock || blockName({ index: 1 }) }}</span>
         <PVideoListToolbarDivider />
       </div>
       <div ref="weekPlaceholder" class="d-inline-flex align-items-center">
-        <span>{{ readableWeek }}</span>
+        <span>{{ readableWeek || weekName({ index: 1 }) }}</span>
         <PVideoListToolbarDivider />
       </div>
     </div>
