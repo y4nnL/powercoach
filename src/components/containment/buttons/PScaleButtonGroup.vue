@@ -27,14 +27,10 @@ const scaleModel = defineModel<Scale>('scale', { required: true })
       type="button"
       class="btn rounded-0"
       :key="scale"
-      :class="{
-        'btn-primary': scaleModel === scale,
-        'btn-dark': scaleModel !== scale
-      }"
+      :class="{ 'btn-primary': scaleModel === scale, 'btn-dark': scaleModel !== scale }"
       @click="emit('update:scale', scale)"
     >
-      <span v-if="scale === Scale.All && props.allMessage">{{ props.allMessage }}</span>
-      <span v-else>{{ t(`common_${scale}`) }}</span>
+      <span>{{ t(`common_${scale}`) }}</span>
     </button>
   </div>
 </template>

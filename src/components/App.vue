@@ -28,13 +28,12 @@ useMutationObserver(
 </script>
 
 <template>
-  <div class="h-100 d-flex flex-column">
+  <div id="container" class="h-100 d-flex flex-column" :class="{ hasModal }">
     <div
       id="main"
       ref="main"
       class="h-100 overflow-x-hidden"
       :class="{
-        hasModal,
         'overflow-y-scroll': !hasModal,
         'overflow-y-hidden': hasModal
       }"
@@ -72,16 +71,20 @@ $dark: #1c1c1c;
   --p-area-bottom: env(safe-area-inset-bottom, 0px);
   --p-area-left: env(safe-area-inset-left, 0px);
   --p-title-font-family: 'Proelium';
+  --p-transition-time: 0.2s;
+  --p-transition-time-lg: calc(var(--p-transition-time) * 2);
+  --p-transition-time-xl: calc(var(--p-transition-time) * 3);
 }
 
 body {
   --bs-body-bg: rgb(var(--bs-dark-rgb));
 }
 
-#main {
-  transition: transform ease-out 0.3s;
+#container {
+  transition: transform ease-out var(--p-transition-time);
+  transform-origin: top center;
   &.hasModal {
-    transform: scale(0.97);
+    transform: translateY(-1%);
   }
 }
 

@@ -4,7 +4,7 @@ import PSlideTransition from '@/components/transitions/PSlideTransition.vue'
 
 <template>
   <Teleport to="#bottom">
-    <PSlideTransition>
+    <PSlideTransition :translation="1" :opacity="false">
       <slot></slot>
     </PSlideTransition>
   </Teleport>

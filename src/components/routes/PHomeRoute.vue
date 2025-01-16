@@ -4,6 +4,6 @@ import BottomBar from '@/components/containment/toolbars/BottomBar.vue'
 
 <template>
   <BottomBar>
-    <div class="bg-danger text-light">ok</div>
+    <div key="PHomeRoute_BottomBar" class="bg-danger text-light">ok</div>
   </BottomBar>
 </template>

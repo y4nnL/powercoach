@@ -13,7 +13,7 @@ export type PVideoListTransitionProps = {
   scale: Scale
 }
 
-const DURATION = 250
+const DURATION = 200
 const DELAY = DURATION / 2
 const SCALE = 0.2
 
@@ -39,7 +39,6 @@ const scaleLevel = {
 }
 
 const appear = ref<boolean>(true)
-
 const enter = ref<{ el: HTMLElement; done: () => void }>()
 const leave = ref<{ el: HTMLElement; done: () => void }>()
 
@@ -190,10 +189,10 @@ watch(
 
 <template>
   <transition
+    :appear="true"
     :name="`scale-${direction}`"
     @enter="(el, done) => (enter = { el: el as HTMLElement, done })"
     @leave="(el, done) => (leave = { el: el as HTMLElement, done })"
-    :appear="true"
   >
     <slot></slot>
   </transition>

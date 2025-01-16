@@ -1,8 +1,9 @@
 {
-  "PVideosRoute_allVideos": "Toutes les vidéos",
+  "PVideosListControl_title_scale": "Échelle",
+  "PVideosListControl_title_date": "Date",
   "common_all": "Tout",
   "common_block": "Block",
-  "common_exercise": "Exercise",
+  "common_exercise": "Exercice",
   "common_set": "Série",
   "common_week": "Semaine",
   "common_workout": "Séance",

@@ -7,7 +7,7 @@
 <style>
 .fade-over-enter-active,
 .fade-over-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity var(--p-transition-time-xl);
 }
 .fade-over-enter-active {
   position: absolute;

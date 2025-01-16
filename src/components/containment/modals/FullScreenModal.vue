@@ -40,11 +40,9 @@ const offsetStart = computed<number>(
     <PSlideTransition :appear="false" :offset-start="offsetStart">
       <div
         v-if="props.show"
-        class="position-absolute left-0 w-100 d-block bg-dark text-light modal"
-        :style="{
-          top: `${offsetStart}px`,
-          height: `calc(100% - ${offsetStart}px)`
-        }"
+        class="position-absolute left-0 w-100 d-block bg-dark text-light modal rounded-top-3"
+        :class="{ 'rounded-top-3': props.snapToolbar || offsetStart > 0 }"
+        :style="{ top: `${offsetStart}px`, height: `calc(100% - ${offsetStart}px)` }"
       >
         <slot></slot>
       </div>

@@ -16,8 +16,8 @@ const { top: isMainScrollingUp, bottom: isMainScrollingDown } = toRefs(useMainSc
 .roll-down-enter-active,
 .roll-down-leave-active {
   transition:
-    transform 0.4s ease-in,
-    opacity 0.4s;
+    transform ease-in var(--p-transition-time-lg),
+    opacity var(--p-transition-time-lg);
 }
 .roll-up-enter-active,
 .roll-down-enter-active {

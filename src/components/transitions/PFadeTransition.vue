@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<PFadeTransitionProps>(), {
 <style>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity linear 0.3s;
+  transition: opacity linear var(--p-transition-time);
 }
 
 .fade-enter-from,

@@ -40,7 +40,7 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .PToolbarButton {
-  transition: background-color 0.3s;
+  transition: background-color var(--p-transition-time);
   width: 2.3rem;
   height: 2.3rem;
   backdrop-filter: blur(5px);

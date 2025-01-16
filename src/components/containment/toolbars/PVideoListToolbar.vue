@@ -84,7 +84,7 @@ useRefStore().set('toolbar', container)
       </div>
     </div>
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient z-2"></div>
-    <div class="d-flex justify-content-between position-relative z-3 w-100 ps-3">
+    <div class="d-flex justify-content-between position-relative z-3 w-100 ps-3 py-2">
       <a
         class="navbar-brand visibility d-flex flex-wrap text-light"
         :class="{ upper: isDateShown, show: isShown }"
@@ -134,7 +134,7 @@ useRefStore().set('toolbar', container)
 
 <style scoped lang="scss">
 .navbar {
-  padding-top: calc(max(var(--p-area-top), var(--bs-navbar-padding-y)) + 1rem) !important;
+  padding-top: calc(max(var(--p-area-top), var(--bs-navbar-padding-y))) !important;
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 .navbar-brand {
@@ -144,10 +144,10 @@ useRefStore().set('toolbar', container)
   }
 }
 .date {
-  transform: translateY(-10%);
+  transform: translateY(-12%);
 }
 .visibility {
-  transition: opacity 0.3s linear;
+  transition: opacity var(--p-transition-time);
   opacity: 0;
   &.show {
     opacity: 1;
@@ -155,23 +155,23 @@ useRefStore().set('toolbar', container)
 }
 .visibility.navbar-brand {
   transition:
-    transform 0.3s ease-in-out,
-    opacity 0.3s linear;
+    transform var(--p-transition-time) ease-in-out,
+    opacity var(--p-transition-time) linear;
   &.upper {
-    transform: translateY(-40%);
+    transform: translateY(-25%);
   }
 }
 .bg-gradient {
   pointer-events: none;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(5px);
   mask-image: linear-gradient(to bottom, black 50%, transparent);
   --bs-gradient: linear-gradient(
     to bottom,
-    rgba(var(--bs-dark-rgb), 1),
+    rgba(var(--bs-dark-rgb), 0.8),
     rgba(var(--bs-dark-rgb), 0)
   );
 }
 .width {
-  transition: width 0.5s ease-in-out;
+  transition: width ease-in-out var(--p-transition-time-lg);
 }
 </style>

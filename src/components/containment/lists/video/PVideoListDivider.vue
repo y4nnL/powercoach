@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PIcon from '@/components/icons/PIcon.vue'
 import PVideoListToolbarDivider from '@/components/containment/toolbars/PVideoListToolbarDivider.vue'
 
 export type PVideoListDividerProps = {
