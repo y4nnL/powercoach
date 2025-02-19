@@ -42,6 +42,11 @@ export type Video = {
   workout: Workout
 }
 
+export type VideoControl = {
+  fromDate?: Date
+  toDate?: Date
+}
+
 export enum Scale {
   All = 'all',
   Block = 'block',

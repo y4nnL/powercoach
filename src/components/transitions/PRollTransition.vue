@@ -1,11 +1,24 @@
 <script setup lang="ts">
+import { computed, toRefs } from 'vue'
 import { useMainScroll } from '@/composables/useMainScroll'
-import { toRefs } from 'vue'
+
+type PRollTransitionProps = {
+  up?: boolean
+  down?: boolean
+}
+
+const props = defineProps<PRollTransitionProps>()
+
+const name = computed<string>(() => {
+  if (props.up) return 'roll-up'
+  if (props.down) return 'roll-down'
+  return `roll-${isMainScrollingUp.value ? 'down' : isMainScrollingDown.value ? 'up' : 'none'}`
+})
 
 const { top: isMainScrollingUp, bottom: isMainScrollingDown } = toRefs(useMainScroll().directions)
 </script>
 <template>
-  <transition :name="`roll-${isMainScrollingUp ? 'down' : isMainScrollingDown ? 'up' : 'none'}`">
+  <transition :name="name">
     <slot></slot>
   </transition>
 </template>
@@ -14,7 +27,9 @@ const { top: isMainScrollingUp, bottom: isMainScrollingDown } = toRefs(useMainSc
 .roll-up-enter-active,
 .roll-up-leave-active,
 .roll-down-enter-active,
-.roll-down-leave-active {
+.roll-down-leave-active,
+.roll-none-enter-active,
+.roll-none-leave-active {
   transition:
     transform ease-in var(--p-transition-time-lg),
     opacity var(--p-transition-time-lg);

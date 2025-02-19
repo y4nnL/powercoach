@@ -1,18 +1,18 @@
 import { useI18n } from 'vue-i18n'
-import { type Block, type Video, type Week, type Workout } from '@/types'
+import { type Block, type Message, type Video, type Week, type Workout } from '@/types'
 
 export type HumanReadability = {
   blockName(block: Block | Pick<Block, 'index' | 'name'>): string
   blockScaleDate(videos: Video[]): string
-  videoDate(video: Video): string
+  videoDate(video: Video | Pick<Video, 'date'>): string
   weekName(week: Week | Pick<Week, 'index' | 'name'>): string
   weekScaleDate(videos: Video[]): string
   workoutName(workout: Workout | Pick<Workout, 'index' | 'name'>): string
-  workoutScaleDate(videos: Video[]): string
+  workoutScaleDate(videos: Video[] | Pick<Video, 'date'>[]): string
 }
 
 export function useHumanReadability(): HumanReadability {
-  const { t, locale } = useI18n()
+  const { t, locale } = useI18n<{ message: Message }>()
 
   function format(
     date: Date,

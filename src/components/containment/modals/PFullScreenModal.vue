@@ -29,20 +29,27 @@ const offsetStart = computed<number>(
 
 <template>
   <Teleport to="#modal">
-    <PFadeTransition :appear="false">
+    <PFadeTransition :appear="true">
       <div
         v-if="props.show"
         class="position-absolute top-0 left-0 w-100 h-100 modal-backdrop"
-        :style="`--bs-backdrop-bg: rgba(0, 0, 0, ${props.dimBackdrop ? 0.5 : 0})`"
+        :style="{
+          '--bs-backdrop-bg': `rgba(0, 0, 0, ${props.dimBackdrop ? 0.5 : 0})`
+        }"
         @click="emits('close')"
       ></div>
     </PFadeTransition>
-    <PSlideTransition :appear="false" :offset-start="offsetStart">
+    <PSlideTransition :appear="true" :offset-start="offsetStart">
       <div
         v-if="props.show"
-        class="position-absolute left-0 w-100 d-block bg-dark text-light modal rounded-top-3"
-        :class="{ 'rounded-top-3': props.snapToolbar || offsetStart > 0 }"
-        :style="{ top: `${offsetStart}px`, height: `calc(100% - ${offsetStart}px)` }"
+        class="position-absolute left-0 w-100 d-block bg-dark text-light modal"
+        :class="{
+          'rounded-top-3': props.snapToolbar || offsetStart > 0
+        }"
+        :style="{
+          top: `${offsetStart}px`,
+          height: `calc(100% - ${offsetStart}px)`
+        }"
       >
         <slot></slot>
       </div>

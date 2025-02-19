@@ -1,26 +1,35 @@
 <script setup lang="ts">
+import PIcon from '@/components/icons/PIcon.vue'
+
 export type PControlProps = {
-  hint?: string
-  title?: string
+  clearable?: boolean
 }
 
 const props = defineProps<PControlProps>()
+
+const model = defineModel<unknown>({ required: true })
+
+const emit = defineEmits<{
+  click: []
+  'update:modelValue': [modelValue: undefined]
+}>()
 </script>
 
 <template>
-  <div class="small ps-3 mb-1 text-uppercase text-light text-opacity-50">
-    <slot name="title">
-      <small>{{ props.title }}</small>
-    </slot>
-  </div>
-  <div class="card bg-light border-0 bg-opacity-25">
-    <div class="card-body">
-      <slot></slot>
-    </div>
-  </div>
-  <div class="small px-3 text-light text-opacity-50 lh-1 mt-2">
-    <slot name="hint">
-      <small>{{ props.hint }}</small>
-    </slot>
+  <div class="PControl d-flex gap-2" @click="emit('click')">
+    <span class="me-auto">
+      <slot name="label"></slot>
+    </span>
+    <strong v-if="model" class="text-dark">
+      <slot name="value">-</slot>
+    </strong>
+    <em v-else class="text-dark">
+      <slot name="fallback">-</slot>
+    </em>
+    <PIcon
+      v-if="props.clearable && typeof model !== 'undefined'"
+      path="mdiClose"
+      @click.stop="emit('update:modelValue', undefined)"
+    ></PIcon>
   </div>
 </template>

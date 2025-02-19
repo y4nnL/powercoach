@@ -9,17 +9,24 @@ import PVideoListToolbarDivider from '@/components/containment/toolbars/PVideoLi
 import PToolbarButton from '@/components/containment/buttons/PToolbarButton.vue'
 
 export type PVideoListToolbarProps = {
-  activateFilters?: boolean
-  filters?: number
+  actions?: PVideoListToolbarAction[]
   scale: Scale
   throttle?: number
   video?: Video
 }
 
+const PVideoListToolbarActionNames = ['controls'] as const
+
+export type PVideoListToolbarAction = {
+  active: boolean
+  count: number
+  name: (typeof PVideoListToolbarActionNames)[number]
+}
+
 const props = withDefaults(defineProps<PVideoListToolbarProps>(), { throttle: 500 })
 
 const emit = defineEmits<{
-  'click:filters': []
+  'click:controls': []
 }>()
 
 const blockPlaceholder = ref<HTMLElement | null>(null)
@@ -61,6 +68,9 @@ const readableWorkout = computed<string>((previousValue) => {
 const readableDate = computed<string>((previousValue) => {
   return date.value ?? previousValue ?? ''
 })
+const controlsAction = computed<PVideoListToolbarAction | null>(
+  () => props.actions?.find(({ name }) => name === 'controls') ?? null
+)
 
 useResizeObserver(blockPlaceholder, ([{ contentRect }]) => {
   blockWidth.value = contentRect.width
@@ -85,46 +95,71 @@ useRefStore().set('toolbar', container)
     </div>
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient z-2"></div>
     <div class="d-flex justify-content-between position-relative z-3 w-100 ps-3 py-2">
-      <a
-        class="navbar-brand visibility d-flex flex-wrap text-light"
-        :class="{ upper: isDateShown, show: isShown }"
-      >
-        <div class="visibility" :class="{ show: isBlockShown }">
-          <PRollTransition>
-            <span class="position-absolute d-inline-flex align-items-center" :key="readableBlock">
-              <span>{{ readableBlock }}</span>
-              <PVideoListToolbarDivider class="visibility" :class="{ show: isWeekShown }" />
-            </span>
-          </PRollTransition>
-          <span class="opacity-0 d-inline-block width" :style="{ width: `${blockWidth}px` }"></span>
-        </div>
-        <div class="visibility" :class="{ show: isWeekShown }">
-          <PRollTransition>
-            <span class="position-absolute d-inline-flex align-items-center" :key="readableWeek">
-              <span>{{ readableWeek }}</span>
-              <PVideoListToolbarDivider class="visibility" :class="{ show: isWorkoutShown }" />
-            </span>
-          </PRollTransition>
-          <span class="opacity-0 d-inline-block width" :style="{ width: `${weekWidth}px` }"></span>
-        </div>
-        <div class="visibility" :class="{ show: isWorkoutShown }">
-          <PRollTransition>
-            <span class="position-absolute" :key="readableWorkout">{{ readableWorkout }}</span>
-          </PRollTransition>
-          <span class="opacity-0">{{ readableWorkout }}</span>
-        </div>
-        <span>&nbsp;</span>
-        <div class="visibility small w-100" :class="{ show: isDateShown }">
-          <span class="position-absolute date">{{ readableDate }}</span>
-        </div>
-      </a>
-      <div class="d-flex text-light pe-3">
+      <PRollTransition :up="controlsAction?.active" :down="!controlsAction?.active">
+        <template v-if="controlsAction?.active">
+          <div key="controls" class="navbar-brand position-absolute text-light">ok</div>
+        </template>
+        <template v-else>
+          <div key="else" class="navbar-brand position-absolute">
+            <a
+              class="visibility d-flex flex-wrap text-light"
+              :class="{ upper: isDateShown, show: isShown }"
+            >
+              <div class="visibility" :class="{ show: isBlockShown }">
+                <PRollTransition>
+                  <span
+                    class="position-absolute d-inline-flex align-items-center"
+                    :key="readableBlock"
+                  >
+                    <span>{{ readableBlock }}</span>
+                    <PVideoListToolbarDivider class="visibility" :class="{ show: isWeekShown }" />
+                  </span>
+                </PRollTransition>
+                <span
+                  class="opacity-0 d-inline-block width"
+                  :style="{ width: `${blockWidth}px` }"
+                ></span>
+              </div>
+              <div class="visibility" :class="{ show: isWeekShown }">
+                <PRollTransition>
+                  <span
+                    class="position-absolute d-inline-flex align-items-center"
+                    :key="readableWeek"
+                  >
+                    <span>{{ readableWeek }}</span>
+                    <PVideoListToolbarDivider
+                      class="visibility"
+                      :class="{ show: isWorkoutShown }"
+                    />
+                  </span>
+                </PRollTransition>
+                <span
+                  class="opacity-0 d-inline-block width"
+                  :style="{ width: `${weekWidth}px` }"
+                ></span>
+              </div>
+              <div class="visibility" :class="{ show: isWorkoutShown }">
+                <PRollTransition>
+                  <span class="position-absolute" :key="readableWorkout">{{
+                    readableWorkout
+                  }}</span>
+                </PRollTransition>
+                <span class="opacity-0">{{ readableWorkout }}</span>
+              </div>
+              <div class="visibility small w-100" :class="{ show: isDateShown }">
+                <span class="position-absolute date">{{ readableDate }}</span>
+              </div>
+            </a>
+          </div>
+        </template>
+      </PRollTransition>
+      <div class="d-flex text-light pe-3 ms-auto">
         <div class="position-relative visibility show">
           <PToolbarButton
             icon="mdiTuneVariant"
-            :active="activateFilters"
-            :badge="0"
-            @click="() => emit('click:filters')"
+            :active="controlsAction?.active ?? false"
+            :badge="controlsAction?.count ?? 0"
+            @click="() => emit('click:controls')"
           ></PToolbarButton>
         </div>
       </div>
@@ -153,7 +188,7 @@ useRefStore().set('toolbar', container)
     opacity: 1;
   }
 }
-.visibility.navbar-brand {
+.navbar-brand .visibility {
   transition:
     transform var(--p-transition-time) ease-in-out,
     opacity var(--p-transition-time) linear;

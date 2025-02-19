@@ -1,8 +1,12 @@
 {
+  "PDateControl_none": "Aucune date",
+  "PDateRangeControlProps_from": "Date de début",
+  "PDateRangeControlProps_to": "Date de fin",
   "PVideosListControl_title_scale": "Échelle",
   "PVideosListControl_title_date": "Date",
   "common_all": "Tout",
   "common_block": "Block",
+  "common_date": "Date",
   "common_exercise": "Exercice",
   "common_set": "Série",
   "common_week": "Semaine",

@@ -1,20 +1,41 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Scale, type Video } from '@/types'
+import { computed, ref } from 'vue'
+import { Scale, type Video, type VideoControl } from '@/types'
 import { useVideosQuery } from '@/composables/useVideosQuery'
+import { useQueryHooks } from '@/composables/useQueryHooks'
 import PVideoList from '@/components/containment/lists/video/PVideoList.vue'
-import PVideoListToolbar from '@/components/containment/toolbars/PVideoListToolbar.vue'
+import PVideoListToolbar, {
+  type PVideoListToolbarAction
+} from '@/components/containment/toolbars/PVideoListToolbar.vue'
 import PLoader from '@/components/containment/loaders/PLoader.vue'
 import PScaleButtonGroup from '@/components/containment/buttons/PScaleButtonGroup.vue'
-import BottomBar from '@/components/containment/toolbars/BottomBar.vue'
-import FullScreenModal from '@/components/containment/modals/FullScreenModal.vue'
-import PVideoListControl from '@/components/controls/PVideoListControl.vue'
+import PBottomBar from '@/components/containment/toolbars/PBottomBar.vue'
+import PFullScreenModal from '@/components/containment/modals/PFullScreenModal.vue'
+import PVideoListControls from '@/components/controls/PVideoListControls.vue'
 
 const scale = ref<Scale>(Scale.All)
 const video = ref<Video>()
-const showFilters = ref<boolean>(false)
+const showControls = ref<boolean>(false)
+const videos = ref<Video[]>([])
+const filteredVideos = ref<Video[]>([])
+const controls = ref<VideoControl>({ fromDate: new Date() })
+
+const toolbarActions = computed<PVideoListToolbarAction[]>(() => [
+  {
+    active: showControls.value,
+    count: 0,
+    name: 'controls'
+  }
+])
 
 const videosQuery = useVideosQuery()
+
+useQueryHooks<Video[]>(videosQuery, {
+  onSuccess: (rawVideos) => {
+    videos.value = rawVideos
+    filteredVideos.value = rawVideos
+  }
+})
 
 const onIntersect = (intersectedVideo?: Video) => {
   video.value = intersectedVideo
@@ -26,28 +47,31 @@ const onIntersect = (intersectedVideo?: Video) => {
     <template #default="{ data: videos }">
       <PVideoListToolbar
         class="sticky-top"
+        :actions="toolbarActions"
         :scale="scale"
         :video="video"
-        :filters="3"
-        :activate-filters="showFilters"
-        @click:filters="showFilters = true"
+        @click:controls="showControls = true"
       ></PVideoListToolbar>
-      <PVideoList v-model:scale="scale" :videos="videos" @intersect="onIntersect"></PVideoList>
-      <BottomBar>
+      <PVideoList
+        v-model:scale="scale"
+        :videos="filteredVideos"
+        @intersect="onIntersect"
+      ></PVideoList>
+      <PBottomBar>
         <PScaleButtonGroup
           key="PVideosRoute_BottomBar"
           class="w-100"
           v-model:scale="scale"
         ></PScaleButtonGroup>
-      </BottomBar>
-      <FullScreenModal
+      </PBottomBar>
+      <PFullScreenModal
         :dim-backdrop="false"
-        :show="showFilters"
-        @close="showFilters = false"
-        snap-toolbar
+        :show="showControls"
+        :snap-toolbar="true"
+        @close="showControls = false"
       >
-        <PVideoListControl v-model:scale="scale"></PVideoListControl>
-      </FullScreenModal>
+        <PVideoListControls v-model="controls" :scale="scale" :videos="videos"></PVideoListControls>
+      </PFullScreenModal>
     </template>
   </PLoader>
 </template>

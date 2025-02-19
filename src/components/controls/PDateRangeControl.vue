@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import type { Message } from '@/types'
+import PDateControl from '@/components/controls/PDateControl.vue'
+
+export type PDateRangeControlProps = {
+  endDate?: Date
+  startDate?: Date
+}
+
+const props = defineProps<PDateRangeControlProps>()
+
+const fromDate = defineModel<Date | undefined>('fromDate', { required: true })
+const toDate = defineModel<Date | undefined>('toDate', { required: true })
+
+const emit = defineEmits<{
+  'update:fromDate': [date: Date | undefined]
+  'update:toDate': [date: Date | undefined]
+}>()
+
+const { t } = useI18n<{ message: Message }>()
+</script>
+
+<template>
+  <PDateControl v-model="fromDate" :start-date="props.startDate" :end-date="props.endDate">
+    <template #title>{{ t('PDateRangeControlProps_from') }}</template>
+  </PDateControl>
+  <PDateControl v-model="toDate" :start-date="props.startDate" :end-date="props.endDate">
+    <template #title>{{ t('PDateRangeControlProps_to') }}</template>
+  </PDateControl>
+</template>
