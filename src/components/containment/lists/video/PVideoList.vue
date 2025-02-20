@@ -133,7 +133,7 @@ function updateAnchor() {
 
 function updateDivider() {
   getElements(['divider-title']).forEach((el) => {
-    el.style.opacity = `${((el.getBoundingClientRect().top - toolbarHeight.value) * 1.75) / 100}`
+    el.style.opacity = `${((el.getBoundingClientRect().top - toolbarHeight.value) * 1.25) / 100}`
   })
 }
 

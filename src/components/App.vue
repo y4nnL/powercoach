@@ -55,9 +55,6 @@ useMutationObserver(
 </template>
 
 <style lang="scss">
-$blue: #dbc078;
-$dark: #1c1c1c;
-
 @font-face {
   font-family: 'Proelium';
   src:
@@ -74,10 +71,6 @@ $dark: #1c1c1c;
   --p-transition-time: 0.2s;
   --p-transition-time-lg: calc(var(--p-transition-time) * 2);
   --p-transition-time-xl: calc(var(--p-transition-time) * 3);
-}
-
-body {
-  --bs-body-bg: rgb(var(--bs-dark-rgb));
 }
 
 #container {

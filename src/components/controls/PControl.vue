@@ -20,10 +20,10 @@ const emit = defineEmits<{
     <span class="me-auto">
       <slot name="label"></slot>
     </span>
-    <strong v-if="model" class="text-dark">
+    <strong v-if="model">
       <slot name="value">-</slot>
     </strong>
-    <em v-else class="text-dark">
+    <em v-else>
       <slot name="fallback">-</slot>
     </em>
     <PIcon

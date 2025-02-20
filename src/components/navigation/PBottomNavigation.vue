@@ -9,7 +9,7 @@ defineExpose({ container })
 </script>
 
 <template>
-  <nav class="navbar navbar-expand navbar-dark bg-dark p-1" ref="container">
+  <nav class="navbar navbar-expand p-1" ref="container">
     <div class="PBottomNavigationCollapse collapse navbar-collapse">
       <ul class="navbar-nav w-100 justify-content-around">
         <li class="nav-item">

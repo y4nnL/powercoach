@@ -35,7 +35,7 @@ const tags = computed<VideoTag[]>(
       <div class="col-12">
         <div
           class="container-fluid position-relative"
-          style="--bs-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5)"
+          style="--bs-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2)"
         >
           <div class="row rounded-4 overflow-hidden shadow">
             <PVideoListItem
@@ -49,10 +49,10 @@ const tags = computed<VideoTag[]>(
               <template #overlay>
                 <div
                   v-if="hiddenVideos.length > 0 && index === previewedVideos.length - 1"
-                  class="card-img-overlay d-flex align-items-center justify-content-center bg-dark rounded-0"
-                  style="--bs-bg-opacity: 0.9"
+                  class="card-img-overlay p-0 d-flex align-items-center justify-content-center rounded-0 bg-dark text-light"
+                  style="--bs-bg-opacity: 0.85"
                 >
-                  <div class="text-bg-dark d-flex flex-column" style="--bs-bg-opacity: 0">
+                  <div class="d-flex flex-column">
                     <PVideoListGroupTag class="mb-1" :videos="props.videos"></PVideoListGroupTag>
                     <PVideoListGroupTag
                       v-for="tag in tags"
@@ -66,14 +66,14 @@ const tags = computed<VideoTag[]>(
               </template>
             </PVideoListItem>
             <div
-              class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 bg-dark bg-gradient text-bg-dark rounded-4"
+              class="PVideoListGroupTitle position-absolute top-0 start-0 pt-2 w-100 bg-gradient rounded-4"
               style="
-                --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+                --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
                 --bs-bg-opacity: 0;
               "
             >
-              <h5 class="card-title">{{ props.title }}</h5>
-              <h6 class="card-subtitle text-dark-subtle small opacity-75">{{ props.subtitle }}</h6>
+              <h5 class="card-title text-light">{{ props.title }}</h5>
+              <h6 class="card-subtitle small text-light opacity-75">{{ props.subtitle }}</h6>
             </div>
           </div>
         </div>

@@ -11,10 +11,10 @@ const props = defineProps<PVideoListDividerProps>()
 
 <template>
   <div
-    class="PVideoListDivider py-1 navbar-brand small bg-dark text-bg-dark ps-3 d-flex align-items-center"
+    class="PVideoListDivider py-1 navbar-brand small ps-3 d-flex align-items-center"
     :class="{ 'pt-4 pb-2': Boolean(props.title) }"
   >
-    <span class="d-inline-flex align-items-center opacity-75">
+    <span class="d-inline-flex align-items-center">
       {{ props.title }}
       <PVideoListToolbarDivider v-if="props.subtitle"></PVideoListToolbarDivider>
       <span v-if="props.subtitle">{{ props.subtitle }}</span>

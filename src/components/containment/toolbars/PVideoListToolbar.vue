@@ -93,18 +93,15 @@ useRefStore().set('toolbar', container)
         <PVideoListToolbarDivider />
       </div>
     </div>
-    <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient z-2"></div>
+    <div class="position-absolute top-0 start-0 w-100 bg-gradient z-2"></div>
     <div class="d-flex justify-content-between position-relative z-3 w-100 ps-3 py-2">
       <PRollTransition :up="controlsAction?.active" :down="!controlsAction?.active">
         <template v-if="controlsAction?.active">
-          <div key="controls" class="navbar-brand position-absolute text-light">ok</div>
+          <div key="controls" class="navbar-brand position-absolute">ok</div>
         </template>
         <template v-else>
           <div key="else" class="navbar-brand position-absolute">
-            <a
-              class="visibility d-flex flex-wrap text-light"
-              :class="{ upper: isDateShown, show: isShown }"
-            >
+            <div class="visibility d-flex flex-wrap" :class="{ upper: isDateShown, show: isShown }">
               <div class="visibility" :class="{ show: isBlockShown }">
                 <PRollTransition>
                   <span
@@ -149,11 +146,11 @@ useRefStore().set('toolbar', container)
               <div class="visibility small w-100" :class="{ show: isDateShown }">
                 <span class="position-absolute date">{{ readableDate }}</span>
               </div>
-            </a>
+            </div>
           </div>
         </template>
       </PRollTransition>
-      <div class="d-flex text-light pe-3 ms-auto">
+      <div class="d-flex pe-3 ms-auto">
         <div class="position-relative visibility show">
           <PToolbarButton
             icon="mdiTuneVariant"
@@ -170,7 +167,7 @@ useRefStore().set('toolbar', container)
 <style scoped lang="scss">
 .navbar {
   padding-top: calc(max(var(--p-area-top), var(--bs-navbar-padding-y))) !important;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .navbar-brand {
   font-family: var(--p-title-font-family), sans-serif;
@@ -198,12 +195,12 @@ useRefStore().set('toolbar', container)
 }
 .bg-gradient {
   pointer-events: none;
-  backdrop-filter: blur(5px);
-  mask-image: linear-gradient(to bottom, black 50%, transparent);
+  height: 150%;
+  mask-image: linear-gradient(to bottom, white 50%, transparent);
   --bs-gradient: linear-gradient(
     to bottom,
-    rgba(var(--bs-dark-rgb), 0.8),
-    rgba(var(--bs-dark-rgb), 0)
+    rgba(var(--bs-light-rgb), 1),
+    rgba(var(--bs-light-rgb), 0)
   );
 }
 .width {

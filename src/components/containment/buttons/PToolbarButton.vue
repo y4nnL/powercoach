@@ -22,8 +22,13 @@ const emit = defineEmits<{
   <PFadeTransition>
     <div
       class="PToolbarButton rounded-pill d-flex justify-content-center align-items-center"
-      :class="active ? 'bg-warning' : 'bg-light'"
-      :style="{ '--bs-bg-opacity': active ? 0.5 : 0.15 }"
+      :class="{
+        'bg-primary text-light': active,
+        'bg-dark': !active
+      }"
+      :style="{
+        '--bs-bg-opacity': active ? 1 : 0.1
+      }"
     >
       <PIcon key="icon" :path="props.icon" @click="emit('click')"></PIcon>
     </div>
@@ -31,7 +36,7 @@ const emit = defineEmits<{
   <PFadeTransition>
     <span
       v-if="props.badge"
-      class="badge rounded-pill bg-warning small position-absolute top-0 start-100 translate-middle"
+      class="badge rounded-pill bg-primary small position-absolute top-0 start-100 translate-middle"
     >
       {{ props.badge }}
     </span>

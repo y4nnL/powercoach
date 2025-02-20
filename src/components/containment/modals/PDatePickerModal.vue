@@ -19,12 +19,19 @@ watch(
       DatePicker.present({
         mode: 'date',
         locale: 'fr_FR',
-        date: moment(date.value).format('DD/MM/YYYY'),
-        theme: 'dark',
-        ios: { format: 'dd/MM/YYYY' }
+        date: moment(date.value).format('MM/DD/YYYY'),
+        theme: 'light',
+        ios: {
+          format: 'MM/dd/YYYY',
+          style: 'wheels',
+          bgColor: 'FFFFFF',
+          titleFontColor: 'FFFFFF'
+        }
       }).then((newDate) => {
         emit('update:show', false)
-        emit('update:date', new Date(newDate.value))
+        if (newDate.value) {
+          emit('update:date', new Date(newDate.value))
+        }
       })
     }
   }

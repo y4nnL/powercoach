@@ -8,17 +8,17 @@ const props = defineProps<PControlGroupProps>()
 </script>
 
 <template>
-  <div class="small ps-3 mb-1 text-uppercase text-light text-opacity-50">
+  <div class="small ps-3 mb-1 text-uppercase text-opacity-50">
     <slot name="title">
       <small>{{ props.title }}</small>
     </slot>
   </div>
-  <div class="card bg-light border-0 bg-opacity-25">
+  <div class="card">
     <div class="card-body d-flex flex-column">
       <slot></slot>
     </div>
   </div>
-  <div class="small px-3 text-light text-opacity-50 lh-1 mt-2">
+  <div class="small px-3 text-opacity-50 lh-1 mt-2">
     <slot name="hint">
       <small>{{ props.hint }}</small>
     </slot>

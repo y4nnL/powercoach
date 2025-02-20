@@ -46,7 +46,7 @@ const submit = () => {
     </PControlGroup>
     <div class="d-grid gap-2 mt-5">
       <button class="btn btn-primary" :disabled="!canSubmit" @click="submit">Filtrer</button>
-      <button class="btn btn-secondary text-black">Annuler</button>
+      <button class="btn btn-secondary">Annuler</button>
     </div>
   </div>
 </template>

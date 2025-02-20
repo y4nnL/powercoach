@@ -42,7 +42,7 @@ const offsetStart = computed<number>(
     <PSlideTransition :appear="true" :offset-start="offsetStart">
       <div
         v-if="props.show"
-        class="position-absolute left-0 w-100 d-block bg-dark text-light modal"
+        class="position-absolute left-0 w-100 d-block modal"
         :class="{
           'rounded-top-3': props.snapToolbar || offsetStart > 0
         }"
@@ -59,6 +59,7 @@ const offsetStart = computed<number>(
 
 <style lang="scss" scoped>
 .modal {
-  box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 -0.5rem 2rem rgba(0, 0, 0, 0.2) !important;
+  background: var(--bs-modal-bg);
 }
 </style>
