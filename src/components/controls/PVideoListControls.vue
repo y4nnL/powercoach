@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import moment from 'moment'
 import { type Message, Scale, type Video, type VideoControl } from '@/types'
 import PScaleButtonGroup from '@/components/containment/buttons/PScaleButtonGroup.vue'
 import PControlGroup from '@/components/controls/PControlGroup.vue'
@@ -25,6 +26,12 @@ const localModel = ref<VideoControl>({ ...model.value })
 const canSubmit = computed<boolean>(
   () => JSON.stringify(model.value) !== JSON.stringify(localModel.value)
 )
+const minDate = computed<Date | undefined>(() =>
+  moment.min(props.videos.map(({ date }) => moment(date))).toDate()
+)
+const maxDate = computed<Date | undefined>(() =>
+  moment.max(props.videos.map(({ date }) => moment(date))).toDate()
+)
 
 const { t } = useI18n<{ message: Message }>()
 
@@ -42,6 +49,8 @@ const submit = () => {
       <PDateRangeControl
         v-model:from-date="localModel.fromDate"
         v-model:to-date="localModel.toDate"
+        :minDate="minDate"
+        :maxDate="maxDate"
       ></PDateRangeControl>
     </PControlGroup>
     <div class="d-grid gap-2 mt-5">

@@ -18,7 +18,7 @@ const video = ref<Video>()
 const showControls = ref<boolean>(false)
 const videos = ref<Video[]>([])
 const filteredVideos = ref<Video[]>([])
-const controls = ref<VideoControl>({ fromDate: new Date() })
+const controls = ref<VideoControl>({})
 
 const toolbarActions = computed<PVideoListToolbarAction[]>(() => [
   {

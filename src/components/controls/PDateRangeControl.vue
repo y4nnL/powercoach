@@ -4,8 +4,8 @@ import type { Message } from '@/types'
 import PDateControl from '@/components/controls/PDateControl.vue'
 
 export type PDateRangeControlProps = {
-  endDate?: Date
-  startDate?: Date
+  minDate?: Date
+  maxDate?: Date
 }
 
 const props = defineProps<PDateRangeControlProps>()
@@ -22,10 +22,10 @@ const { t } = useI18n<{ message: Message }>()
 </script>
 
 <template>
-  <PDateControl v-model="fromDate" :start-date="props.startDate" :end-date="props.endDate">
+  <PDateControl v-model="fromDate" :min-date="props.minDate" :max-date="toDate ?? props.maxDate">
     <template #title>{{ t('PDateRangeControlProps_from') }}</template>
   </PDateControl>
-  <PDateControl v-model="toDate" :start-date="props.startDate" :end-date="props.endDate">
+  <PDateControl v-model="toDate" :min-date="fromDate ?? props.minDate" :max-date="props.maxDate">
     <template #title>{{ t('PDateRangeControlProps_to') }}</template>
   </PDateControl>
 </template>

@@ -18,10 +18,10 @@ useRefStore().set('main', main)
 
 useMutationObserver(
   modal,
-  (entries) => {
-    hasModal.value = entries
-      .flatMap(({ addedNodes }) => [...addedNodes].some((node) => node.nodeType === 1))
-      .some(Boolean)
+  () => {
+    hasModal.value = Boolean(
+      Array.from(modal.value?.childNodes ?? []).find(({ nodeType }) => nodeType === 1)
+    )
   },
   { childList: true }
 )
@@ -77,9 +77,10 @@ useMutationObserver(
   transition: transform ease-out var(--p-transition-time);
   transform-origin: top center;
   &.hasModal {
-    transform: translateY(-1%);
+    transform: translateY(-0.75%);
   }
 }
 
 @import 'bootstrap/scss/bootstrap.scss';
+@import '@vuepic/vue-datepicker/dist/main.css';
 </style>

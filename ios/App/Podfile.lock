@@ -1,28 +1,22 @@
 PODS:
   - Capacitor (6.2.0):
     - CapacitorCordova
-  - CapacitorCommunityDatePicker (6.0.0):
-    - Capacitor
   - CapacitorCordova (6.2.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
-  - "CapacitorCommunityDatePicker (from `../../node_modules/@capacitor-community/date-picker`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
-  CapacitorCommunityDatePicker:
-    :path: "../../node_modules/@capacitor-community/date-picker"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
 
 SPEC CHECKSUMS:
   Capacitor: 05d35014f4425b0740fc8776481f6a369ad071bf
-  CapacitorCommunityDatePicker: 30a95744b841c9082f9cdead84b36d7c3ede500c
   CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
 
-PODFILE CHECKSUM: 0661f18ef5328137ae01a1303dcb7f791f55b298
+PODFILE CHECKSUM: 8ab55909c5de2b217f9841e5e5b329f5ec901553
 
 COCOAPODS: 1.16.2

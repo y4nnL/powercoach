@@ -13,7 +13,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@capacitor-community/date-picker": "^6.0.0",
     "@capacitor/android": "^6.2.0",
     "@capacitor/core": "^6.2.0",
     "@capacitor/ios": "^6.2.0",
@@ -22,6 +21,7 @@
     "@popperjs/core": "^2.11.8",
     "@tanstack/vue-query": "^5.54.1",
     "@types/animejs": "^3.1.12",
+    "@vuepic/vue-datepicker": "^11.0.1",
     "@vueuse/core": "^11.0.3",
     "animejs": "^3.2.2",
     "bootstrap": "^5.3.3",

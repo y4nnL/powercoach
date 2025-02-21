@@ -7,8 +7,8 @@ import PDatePickerModal from '@/components/containment/modals/PDatePickerModal.v
 import PControl from '@/components/controls/PControl.vue'
 
 export type PDateControlProps = {
-  endDate?: Date
-  startDate?: Date
+  minDate?: Date
+  maxDate?: Date
 }
 
 const props = defineProps<PDateControlProps>()
@@ -33,7 +33,12 @@ const { t } = useI18n<{ message: Message }>()
     <template #value>{{ date && videoDate({ date: date.toISOString() }) }}</template>
     <template #fallback>{{ t('PDateControl_none') }}</template>
   </PControl>
-  <PDatePickerModal v-model:date="date" v-model:show="show"></PDatePickerModal>
+  <PDatePickerModal
+    v-model:date="date"
+    v-model:show="show"
+    :min-date="props.minDate"
+    :max-date="props.maxDate"
+  ></PDatePickerModal>
 </template>
 
 <style lang="scss" scoped></style>
